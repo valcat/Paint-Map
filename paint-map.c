@@ -5,26 +5,52 @@
 #include <GL/glut.h>
 #include <stdbool.h>
 
-typedef struct Panel_tools
+int height_window = 800;
+int width_window = 800;
+int flag = 0;
+
+typedef struct Panel_border
 {
-  //coordinates of panel's boorder
+  //coordinates of panel's border
   int x_border;
   int y_border;
   int width_border;
   int height_border;
+  
+} Panel_border;
+
+typedef struct Button
+{
   //tools for drawing
+  //rectangle
   int x_rect;
   int y_rect;
   int width_rect;
-  int height_rect;
-} Panel_tools;
+  int height_rect; 
+  //triangle
+  int x_tr_1st;
+  int y_tr_1st;
+  int x_tr_2d;
+  int y_tr_2d;
+  int x_tr_3d;
+  int y_tr_3d;
+  //line
+  int x_line_1st;
+  int y_line_1st;
+  int x_line_2d;
+  int y_line_2d;
+  
+} Button;
 
-Panel_tools* border = NULL;
-Panel_tools* tool_rect = NULL;
 
-Panel_tools* create_panel_border(int x, int y, int width, int height)
+Panel_border* border = NULL;
+Button* tool_rect = NULL;
+Button* tool_triangle = NULL;
+Button* tool_line = NULL;
+
+Panel_border* create_panel_border(int x, int y, int width, int height)
 {
-  Panel_tools* border = malloc(sizeof(Panel_tools));
+  Panel_border* border = malloc(sizeof(Panel_border));
   border->x_border = x;
   border->y_border = y;
   border->width_border = width;
@@ -33,9 +59,9 @@ Panel_tools* create_panel_border(int x, int y, int width, int height)
   return border;
 }
 
-Panel_tools* create_tool_rect(int x, int y, int width, int height)
+Button* create_tool_rect(int x, int y, int width, int height)
 {
-  Panel_tools* tool_rect = malloc(sizeof(Panel_tools));
+  Button* tool_rect = malloc(sizeof(Button));
   tool_rect->x_rect = x;
   tool_rect->y_rect = y;
   tool_rect->width_rect = width;
@@ -44,10 +70,36 @@ Panel_tools* create_tool_rect(int x, int y, int width, int height)
   return tool_rect;
 }
 
+Button* create_tool_triangle(int x1, int y1, int x2, int y2, int x3,  int y3)
+{
+  Button* tool_triangle = malloc(sizeof(Button));
+  tool_triangle->x_tr_1st = x1;
+  tool_triangle->y_tr_1st = y1;
+  tool_triangle->x_tr_2d = x2;
+  tool_triangle->y_tr_2d = y2;
+  tool_triangle->x_tr_3d = x3;
+  tool_triangle->y_tr_3d = y3;
+
+  return tool_triangle;
+}
+
+Button* create_tool_line(int x1, int y1, int x2, int y2)
+{
+  Button* tool_line = malloc(sizeof(Button));
+  tool_line->x_line_1st = x1;
+  tool_line->y_line_1st = y1;
+  tool_line->x_line_2d = x2;
+  tool_line->y_line_2d = y2;
+
+  return tool_line;
+}
+
 void init(void)
 {
-  Panel_tools* border = create_panel_border(0, 0, 60, 800);
-  Panel_tools* tool_rect = create_tool_rect(20, 740, 20, 20);
+  border = create_panel_border(0, 0, 60, 800);
+  tool_rect = create_tool_rect(20, 740, 20, 20);
+  tool_triangle = create_tool_triangle(30, 680, 20, 660, 40, 660);
+  tool_line = create_tool_line(20, 600, 40, 620);
 }
 
 void reshape(int width, int height)
@@ -60,7 +112,7 @@ void reshape(int width, int height)
   glLoadIdentity();
 }
 
-void draw_panel(Panel_tools* border)
+void draw_panel(Panel_border* border)
 {
   int x, y, width, height;
   x = border->x_border;
@@ -79,7 +131,43 @@ void draw_panel(Panel_tools* border)
   glutSwapBuffers();
 }
 
-void draw_rectangle(Panel_tools *tool_rect) 
+void draw_greed(void)
+{
+  //begining of the greed
+  int x_vert = 60;
+  int y_vert = 0;
+  int x_hor = 60;
+  int y_hor = 0;
+
+  int i = 0;
+  int step = 20;
+  int num_lines = width_window / step;
+
+  //vertical lines
+  for (i = 0; i < num_lines; i++) {
+    glColor3f(0.8f, 0.8f, 0.8f);
+    glLineWidth(1);
+    glBegin(GL_LINES);
+      glVertex2d(x_vert, y_vert);
+      glVertex2d(x_vert, height_window);
+    glEnd();
+    x_vert = x_vert + step;
+    glFlush();
+  }
+  //horizontal lines
+  for (i = 0; i < num_lines; i++) {
+    glColor3f(0.8f, 0.8f, 0.8f);
+    glLineWidth(1);
+    glBegin(GL_LINES);
+      glVertex2d(x_hor, y_hor);
+      glVertex2d(width_window, y_hor);
+    glEnd();
+    y_hor = y_hor + step;
+    glFlush();
+  }
+}
+
+void draw_rectangle(Button *tool_rect) 
 {
   int x, y, width, height;
   x = tool_rect->x_rect;
@@ -98,45 +186,63 @@ void draw_rectangle(Panel_tools *tool_rect)
   glutSwapBuffers();
 }
 
-void draw_greed(void)
+void draw_triangle(Button* tool_triangle)
 {
-  double x = 60;
-  double y = 0;
-  int i = 0;
-  int j = 0;
-  int width = 800;
-  int height = 800;
-  double step = 20;
-  double num_lines = width / step;
+  int x1, x2, x3, y1, y2, y3;
+  x1 = tool_triangle->x_tr_1st;
+  y1 = tool_triangle->y_tr_1st;
+  x2 = tool_triangle->x_tr_2d;
+  y2 = tool_triangle->y_tr_2d;
+  x3 = tool_triangle->x_tr_3d;
+  y3 = tool_triangle->y_tr_3d;
 
-  //vertical lines
-  for (i = 0; i < num_lines; i++) {
-    glColor3f(0.8f, 0.8f, 0.8f);
-    glLineWidth(1);
-    glBegin(GL_LINES);
-      glVertex2d(x, 0);
-      glVertex2d(x, height);
-    glEnd();
-    x = x + step;
-    glFlush();
-  }
-  //horizontal lines
-  for (i = 0; i < num_lines; i++) {
-    glColor3f(0.8f, 0.8f, 0.8f);
-    glLineWidth(1);
-    glBegin(GL_LINES);
-      glVertex2d(60, y);
-      glVertex2d(width, y);
-    glEnd();
-    y = y + step;
-    glFlush();
-  }
+  glColor3f(1.0, 0.0, 0.3);
+  glBegin(GL_TRIANGLES);               
+    glVertex2f(x1, y1);        
+    glVertex2f(x2, y2);       
+    glVertex2f(x3, y3);    
+  glEnd();
+  glFlush();
+  glutSwapBuffers();
 }
 
+void draw_line(Button* tool_line) 
+{
+  int x1, y1, x2, y2;
+  x1 = tool_line->x_line_1st;
+  y1 = tool_line->y_line_1st;
+  x2 = tool_line->x_line_2d;
+  y2 = tool_line->y_line_2d;
+ 
+  glColor3f(0.0,0.4,0.2); 
+  glPointSize(3.0);  
+
+  glBegin(GL_LINES);
+    glVertex2d(x1, y1);
+    glVertex2d(x2, y2);
+  glEnd();
+  glFlush();
+  glutSwapBuffers();
+} 
+
+void draw(void)
+{
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+
+  //draw working window and panel with set of tools
+  draw_greed();
+  draw_panel(border);
+  draw_rectangle(tool_rect);
+  draw_triangle(tool_triangle);
+  draw_line(tool_line);
+}
+
+//to delete
 void draw_rectangle2(int x, int y) 
 {
-  double width = 20;
-  double height = 20;
+  int width = 20;
+  int height = 20;
 
   glColor3f(0.0, 1.0, 0.0);
   glBegin(GL_QUADS);              
@@ -149,75 +255,50 @@ void draw_rectangle2(int x, int y)
   glutSwapBuffers();
 }
 
-void draw_rectangle_frame(void) 
+//to delete
+void draw_line2(int x1, int y1) 
 {
-  double x = 20;
-  double y = 740;
-  double width = 20;
-  double height = 20;
+  glColor3f(0.0,0.4,0.2); 
+  glPointSize(3.0);  
 
-  glColor3f(0.0, 0.0, 0.0);
   glBegin(GL_LINES);
-    glVertex2d(20, 760);             
-    glVertex2d(40, 760); 
-    glVertex2d(40, 760); 
-    glVertex2d(40, 740);              
-    glVertex2d(40, 740);             
-    glVertex2d(20, 740);
-    glVertex2d(20, 740);
-    glVertex2d(20, 760);                   
-  glEnd();  
-  glFlush();
-  glutSwapBuffers();
-}
-
-void draw_triangle(void)
-{
-  glBegin(GL_TRIANGLES);          
-    glColor3f(0.0f,1.0f,0.0f);      
-    glVertex2f( 30.0f, 680.0f);    
-    glColor3f(0.0f,0.0f,1.0f);      
-    glVertex2f(20.0f, 660.0f);    
-    glColor3f(1.0f,0.0f,0.0f);      
-    glVertex2f( 40.0f, 660.0f);    
+    glVertex2d(x1, y1);
+    glVertex2d(x1, y1);
   glEnd();
   glFlush();
   glutSwapBuffers();
-}
-
-void draw(void)
-{
-  Panel_tools* border = create_panel_border(0, 0, 60, 800);
-  Panel_tools* tool_rect = create_tool_rect(20, 740, 20, 20);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-
-  draw_panel(border);
-  draw_rectangle(tool_rect);
-  draw_greed();
-  draw_triangle();
-}
+} 
 
 void mouse(int button, int state, int x, int y)
 {
-  int new_y = 800 - y;
+  int new_y = height_window - y;
+  int panel_bord_end = 60;
   printf("x - %d\n", x);
   printf("y - %d\n", new_y);
+
   if ((x >= 20) && (x <= 40) && (new_y >= 740) && (new_y <= 760)) {
-    printf("hoh\n");
-    draw_rectangle_frame();
+    flag = 1;
   }
-  if ((x > 60)) {
-    draw_rectangle2(x, new_y);
-  }
+  switch (flag) {
+    case 1:
+      if (x > panel_bord_end) {
+        //draw_rectangle2(x, new_y);
+        draw_line2(x, new_y);
+        printf("FO\n");
+      }
+      break;
+    case 2:
+      draw_rectangle2(x, new_y);
+      break;
+  }  
 }
 
 int main(int argc, char *argv[])
 {
-  //init();
+  init();
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH);
-  glutInitWindowSize(800, 800);
+  glutInitWindowSize(height_window, width_window);
   glutInitWindowPosition(0, 0);
   glutCreateWindow("Cat-pensil");
   glutReshapeFunc(reshape);
