@@ -1,5 +1,5 @@
 # Paint-Map
-######C-programme to paint a map with a set of instruments.
+#####C-programme to paint a map with a set of instruments.
 Before running install glut on your PC:
 
 for ubuntu: ```sudo apt-get install freeglut3-dev ```
