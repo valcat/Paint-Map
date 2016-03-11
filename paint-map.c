@@ -11,6 +11,11 @@ const int PANEL_BORD_PADDING = 60;
 const char* WINDOW_NAME = "CAT-MAP";
 int flag = 0;
 
+typedef enum Figure 
+{
+  RECTANGLE, TRIANGLE, LINE
+} Figure;
+
 typedef struct Point
 {
   int x;
@@ -29,10 +34,18 @@ typedef struct Panel_border
   Rectangle rect;
 } Panel_border;
 
+typedef struct Geed
+{
+  int x_vert;
+  int y_vert;
+  int x_hor;
+  int y_hor;
+  int step;
+} Greed;
+
 typedef struct Button
 {
   Rectangle rect;
-
   //triangle
   int x_tr_1st;
   int y_tr_1st;
@@ -45,13 +58,14 @@ typedef struct Button
   int y_line_1st;
   int x_line_2d;
   int y_line_2d;
+  Figure figure;
 } Button;
-
 
 Panel_border* border = NULL;
 Button* button_rect = NULL;
 Button* button_triangle = NULL;
 Button* button_line = NULL;
+Greed* greed = NULL;
 
 Panel_border* create_panel_border(int x, int y, int width, int height)
 {
@@ -99,12 +113,25 @@ Button* create_button_line(int x1, int y1, int x2, int y2)
   return button_line;
 }
 
+Greed* create_greed(int x_hor, int y_hor, int x_vert, int y_vert, int step)
+{
+  Greed* greed = malloc(sizeof(Greed));
+  greed->x_hor = x_hor;
+  greed->y_hor = y_hor;
+  greed->x_vert = x_vert;
+  greed->y_vert = y_vert;
+  greed->step = step;
+
+  return greed;
+}
+
 void init(void)
 {
   border = create_panel_border(0, 0, 60, 800);
   button_rect = create_button_rect(20, 740, 20, 20);
   button_triangle = create_button_triangle(30, 680, 20, 660, 40, 660);
   button_line = create_button_line(20, 600, 40, 620);
+  greed = create_greed(60, 0, 60, 0, 20);
 }
 
 void reshape(int width, int height)
@@ -136,16 +163,16 @@ void draw_panel(Panel_border* border)
   glutSwapBuffers();
 }
 
-void draw_greed(void)
+void draw_greed(Greed* greed)
 {
-  //begining of the greed
-  int x_vert = 60;
-  int y_vert = 0;
-  int x_hor = 60;
-  int y_hor = 0;
-
+  int x1, y1, x2, y2, step;
   int i = 0;
-  int step = 20;
+  x1 = greed->x_hor;
+  y1 = greed->y_hor;
+  x2 = greed->x_hor;
+  y2 = greed->y_hor;
+  step = greed->step;
+
   int num_lines = WIDTH_WINDOW / step;
 
   //vertical lines
@@ -153,10 +180,10 @@ void draw_greed(void)
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1);
     glBegin(GL_LINES);
-      glVertex2d(x_vert, y_vert);
-      glVertex2d(x_vert, HEIGHT_WINDOW);
+      glVertex2d(x1, y1);
+      glVertex2d(x1, HEIGHT_WINDOW);
     glEnd();
-    x_vert = x_vert + step;
+    x1 = x1 + step;
     glFlush();
   }
   //horizontal lines
@@ -164,10 +191,10 @@ void draw_greed(void)
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1);
     glBegin(GL_LINES);
-      glVertex2d(x_hor, y_hor);
-      glVertex2d(WIDTH_WINDOW, y_hor);
+      glVertex2d(x2, y2);
+      glVertex2d(WIDTH_WINDOW, y2);
     glEnd();
-    y_hor = y_hor + step;
+    y2 = y2 + step;
     glFlush();
   }
 }
@@ -243,7 +270,7 @@ void draw(void)
   glLoadIdentity();
 
   //draw working window and panel with set of tools
-  draw_greed();
+  draw_greed(greed);
   draw_panel(border);
   draw_buttons();
 }
@@ -318,6 +345,7 @@ int main(int argc, char *argv[])
   free(button_rect);
   free(button_triangle);
   free(button_line);
+  free(greed);
 
   return 0;
 }
