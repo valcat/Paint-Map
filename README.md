@@ -4,4 +4,4 @@
 
 for ubuntu: ```sudo apt-get install freeglut3-dev ```
 
-To run paint-map.c use: ```gcc paint-map.c -o paint-map -lGL -lGL -lglut && ./paint-map```
+To run paint-map.c use: ```gcc paint-map.c -lGL -lGL -lglut -lm -o paint-map && ./paint-map```
