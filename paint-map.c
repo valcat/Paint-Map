@@ -4,16 +4,19 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #include <stdbool.h>
+#include <math.h>
 
+#define M_PI 3.14159265358979323846
 const int HEIGHT_WINDOW = 800;
 const int WIDTH_WINDOW = 800;
 const int PANEL_BORD_PADDING = 60;
 const char* WINDOW_NAME = "CAT-MAP";
+const int STEP = 20;
 int flag = 0;
 
 typedef enum Figure 
 {
-  RECTANGLE, TRIANGLE, LINE
+  RECTANGLE, TRIANGLE, LINE, CIRCLE
 } Figure;
 
 typedef struct Point
@@ -34,13 +37,12 @@ typedef struct Panel_border
   Rectangle rect;
 } Panel_border;
 
-typedef struct Geed
+typedef struct Greed
 {
   int x_vert;
   int y_vert;
   int x_hor;
   int y_hor;
-  int step;
 } Greed;
 
 typedef struct Button
@@ -58,6 +60,11 @@ typedef struct Button
   int y_line_1st;
   int x_line_2d;
   int y_line_2d;
+  //circle
+  int cx;
+  int cy;
+  int radius;
+  int num_segments;
   Figure figure;
 } Button;
 
@@ -65,6 +72,7 @@ Panel_border* border = NULL;
 Button* button_rect = NULL;
 Button* button_triangle = NULL;
 Button* button_line = NULL;
+Button* button_circle = NULL;
 Greed* greed = NULL;
 
 Panel_border* create_panel_border(int x, int y, int width, int height)
@@ -113,14 +121,24 @@ Button* create_button_line(int x1, int y1, int x2, int y2)
   return button_line;
 }
 
+Button* create_button_circle(int x, int y, int radius, int num_segments)
+{
+  Button* button_circle = malloc(sizeof(Button));
+  button_circle->cx = x;
+  button_circle->cy = y;
+  button_circle->radius = radius;
+  button_circle->num_segments = num_segments;
+
+  return button_circle;
+}
+
 Greed* create_greed(int x_hor, int y_hor, int x_vert, int y_vert, int step)
 {
   Greed* greed = malloc(sizeof(Greed));
   greed->x_hor = x_hor;
   greed->y_hor = y_hor;
   greed->x_vert = x_vert;
-  greed->y_vert = y_vert;
-  greed->step = step;
+  greed->y_vert = y_vert; 
 
   return greed;
 }
@@ -131,6 +149,7 @@ void init(void)
   button_rect = create_button_rect(20, 740, 20, 20);
   button_triangle = create_button_triangle(30, 680, 20, 660, 40, 660);
   button_line = create_button_line(20, 600, 40, 620);
+  button_circle = create_button_circle(30, 550, 10, 360);
   greed = create_greed(60, 0, 60, 0, 20);
 }
 
@@ -165,15 +184,14 @@ void draw_panel(Panel_border* border)
 
 void draw_greed(Greed* greed)
 {
-  int x1, y1, x2, y2, step;
+  int x1, y1, x2, y2;
   int i = 0;
   x1 = greed->x_hor;
   y1 = greed->y_hor;
   x2 = greed->x_hor;
   y2 = greed->y_hor;
-  step = greed->step;
 
-  int num_lines = WIDTH_WINDOW / step;
+  int num_lines = WIDTH_WINDOW / STEP;
 
   //vertical lines
   for (i = 0; i < num_lines; i++) {
@@ -183,7 +201,7 @@ void draw_greed(Greed* greed)
       glVertex2d(x1, y1);
       glVertex2d(x1, HEIGHT_WINDOW);
     glEnd();
-    x1 = x1 + step;
+    x1 = x1 + STEP;
     glFlush();
   }
   //horizontal lines
@@ -194,7 +212,7 @@ void draw_greed(Greed* greed)
       glVertex2d(x2, y2);
       glVertex2d(WIDTH_WINDOW, y2);
     glEnd();
-    y2 = y2 + step;
+    y2 = y2 + STEP;
     glFlush();
   }
 }
@@ -229,7 +247,6 @@ void draw_rectangle_button(Button *button_rect)
 void draw_triangle_button(Button* button_triangle)
 {
   int x1, x2, x3, y1, y2, y3;
-  int step = 20;
   x1 = button_triangle->x_tr_1st;
   y1 = button_triangle->y_tr_1st;
   x2 = button_triangle->x_tr_2d;
@@ -248,8 +265,8 @@ void draw_triangle_button(Button* button_triangle)
   glBegin(GL_LINE_LOOP);
     glVertex2f(x2, y2);               
     glVertex2f(x3, y3);         
-    glVertex2f(x3, y3 + step);  
-    glVertex2f(x2, y2 + step);
+    glVertex2f(x3, y3 + STEP);  
+    glVertex2f(x2, y2 + STEP);
   glEnd();
   glFlush();
   glutSwapBuffers();
@@ -258,7 +275,6 @@ void draw_triangle_button(Button* button_triangle)
 void draw_line_button(Button* button_line) 
 {
   int x1, y1, x2, y2;
-  int step = 20;
   x1 = button_line->x_line_1st;
   y1 = button_line->y_line_1st;
   x2 = button_line->x_line_2d;
@@ -275,19 +291,61 @@ void draw_line_button(Button* button_line)
   glPointSize(8.0);
   glBegin(GL_LINE_LOOP);
     glVertex2f(x1, y1);               
-    glVertex2f(x1 + step, y1);         
+    glVertex2f(x1 + STEP, y1);         
     glVertex2f(x2, y2);  
-    glVertex2f(x1, y1 + step);
+    glVertex2f(x1, y1 + STEP);
   glEnd();
   glFlush();
   glutSwapBuffers();
 } 
+
+void draw_circle_button(Button* button_circle)
+{
+  int i, cx, cy, num_segments, r, half_step;
+  double theta, c, s, x;
+  double t = 0.0;
+  double y = 0;
+  cx = button_circle->cx;
+  cy = button_circle->cy;
+  num_segments = button_circle->num_segments;
+  r = button_circle->radius;
+
+  theta = 2 * M_PI / num_segments;
+  c = cos(theta);
+  s = sin(theta);
+  x = r;
+  half_step = STEP / 2;
+
+  glColor3f(0.0, 1.0, 1.0);
+  glBegin(GL_POLYGON);
+  for (i = 0; i < num_segments; i++)
+  {
+    glVertex2f(x + cx, y + cy);
+    t = x;
+    x = c * x - s * y;
+    y = s * t + c * y;
+  } 
+  glEnd();
+
+glColor3f(0.0, 0.0, 0.0);
+  glPointSize(8.0);
+  glBegin(GL_LINE_LOOP);
+    glVertex2f(cx - half_step, cy - half_step);               
+    glVertex2f(cx + half_step, cy - half_step);         
+    glVertex2f(cx + half_step, cy + half_step);  
+    glVertex2f(cx - half_step, cy + half_step);
+  glEnd();
+
+  glFlush();
+  glutSwapBuffers();
+}
 
 void draw_buttons(void)
 {
   draw_rectangle_button(button_rect);
   draw_triangle_button(button_triangle);
   draw_line_button(button_line);
+  draw_circle_button(button_circle);
 }
 
 void draw(void)
@@ -345,7 +403,7 @@ void mouse(int button, int state, int x, int y)
     case 1:
       if (x > PANEL_BORD_PADDING) {
         draw_rectangle2(x, new_y);
-        //printf("Yes\n");
+        printf("Yes\n");
       }
       break;
     case 2:
