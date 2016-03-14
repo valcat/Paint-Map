@@ -206,9 +206,17 @@ void draw_rectangle_button(Button *button_rect)
   y = button_rect->rect.point.y;
   width = button_rect->rect.width;
   height = button_rect->rect.height;
+ 
+  glBegin(GL_QUADS); 
+    glColor3f(0.0, 1.0, 0.0);           
+    glVertex2f(x, y);               
+    glVertex2f(x + width, y);         
+    glVertex2f(x + width, y + height);  
+    glVertex2f(x, y + height);
+  glEnd();
 
-  glColor3f(0.0, 1.0, 0.0);
-  glBegin(GL_QUADS);              
+  glColor3f(0.0, 0.0, 0.0);
+  glBegin(GL_LINE_LOOP);
     glVertex2f(x, y);               
     glVertex2f(x + width, y);         
     glVertex2f(x + width, y + height);  
@@ -221,6 +229,7 @@ void draw_rectangle_button(Button *button_rect)
 void draw_triangle_button(Button* button_triangle)
 {
   int x1, x2, x3, y1, y2, y3;
+  int step = 20;
   x1 = button_triangle->x_tr_1st;
   y1 = button_triangle->y_tr_1st;
   x2 = button_triangle->x_tr_2d;
@@ -234,6 +243,14 @@ void draw_triangle_button(Button* button_triangle)
     glVertex2f(x2, y2);       
     glVertex2f(x3, y3);    
   glEnd();
+
+  glColor3f(0.0, 0.0, 0.0);
+  glBegin(GL_LINE_LOOP);
+    glVertex2f(x2, y2);               
+    glVertex2f(x3, y3);         
+    glVertex2f(x3, y3 + step);  
+    glVertex2f(x2, y2 + step);
+  glEnd();
   glFlush();
   glutSwapBuffers();
 }
@@ -241,6 +258,7 @@ void draw_triangle_button(Button* button_triangle)
 void draw_line_button(Button* button_line) 
 {
   int x1, y1, x2, y2;
+  int step = 20;
   x1 = button_line->x_line_1st;
   y1 = button_line->y_line_1st;
   x2 = button_line->x_line_2d;
@@ -248,10 +266,18 @@ void draw_line_button(Button* button_line)
  
   glColor3f(0.0,0.4,0.2); 
   glPointSize(3.0);  
-
   glBegin(GL_LINES);
     glVertex2d(x1, y1);
     glVertex2d(x2, y2);
+  glEnd();
+
+  glColor3f(0.0, 0.0, 0.0);
+  glPointSize(8.0);
+  glBegin(GL_LINE_LOOP);
+    glVertex2f(x1, y1);               
+    glVertex2f(x1 + step, y1);         
+    glVertex2f(x2, y2);  
+    glVertex2f(x1, y1 + step);
   glEnd();
   glFlush();
   glutSwapBuffers();
@@ -319,7 +345,7 @@ void mouse(int button, int state, int x, int y)
     case 1:
       if (x > PANEL_BORD_PADDING) {
         draw_rectangle2(x, new_y);
-        printf("Yes\n");
+        //printf("Yes\n");
       }
       break;
     case 2:
