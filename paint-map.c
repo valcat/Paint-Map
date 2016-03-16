@@ -48,20 +48,14 @@ typedef struct Button
 {
   Rectangle rect;
   //triangle
-  int x_tr_1st;
-  int y_tr_1st;
-  int x_tr_2d;
-  int y_tr_2d;
-  int x_tr_3d;
-  int y_tr_3d;
+  Point first_point;
+  Point sec_point;
+  Point third_point;
   //line
-  int x_line_1st;
-  int y_line_1st;
-  int x_line_2d;
-  int y_line_2d;
+  Point point_line_first;
+  Point point_line_sec;
   //circle
-  int cx;
-  int cy;
+  Point point_circle;
   int radius;
   int num_segments;
   Figure figure;
@@ -101,12 +95,12 @@ Button* create_button_rect(int x, int y, int width, int height)
 Button* create_button_triangle(int x1, int y1, int x2, int y2, int x3,  int y3)
 {
   Button* button_triangle = malloc(sizeof(Button));
-  button_triangle->x_tr_1st = x1;
-  button_triangle->y_tr_1st = y1;
-  button_triangle->x_tr_2d = x2;
-  button_triangle->y_tr_2d = y2;
-  button_triangle->x_tr_3d = x3;
-  button_triangle->y_tr_3d = y3;
+  button_triangle->first_point.x = x1;
+  button_triangle->first_point.y = y1;
+  button_triangle->sec_point.x= x2;
+  button_triangle->sec_point.y = y2;
+  button_triangle->third_point.x = x3;
+  button_triangle->third_point.y = y3;
 
   return button_triangle;
 }
@@ -114,10 +108,10 @@ Button* create_button_triangle(int x1, int y1, int x2, int y2, int x3,  int y3)
 Button* create_button_line(int x1, int y1, int x2, int y2)
 {
   Button* button_line = malloc(sizeof(Button));
-  button_line->x_line_1st = x1;
-  button_line->y_line_1st = y1;
-  button_line->x_line_2d = x2;
-  button_line->y_line_2d = y2;
+  button_line->point_line_first.x = x1;
+  button_line->point_line_first.y = y1;
+  button_line->point_line_sec.x = x2;
+  button_line->point_line_sec.y= y2;
 
   return button_line;
 }
@@ -125,8 +119,8 @@ Button* create_button_line(int x1, int y1, int x2, int y2)
 Button* create_button_circle(int x, int y, int radius, int num_segments)
 {
   Button* button_circle = malloc(sizeof(Button));
-  button_circle->cx = x;
-  button_circle->cy = y;
+  button_circle->point_circle.x = x;
+  button_circle->point_circle.y = y;
   button_circle->radius = radius;
   button_circle->num_segments = num_segments;
 
@@ -156,6 +150,7 @@ void init(void)
   coordinates[1] = button_triangle;
   coordinates[2] = button_line;
   coordinates[3] = button_circle;
+  printf("x %d\n", coordinates[0]->rect.point.x);
 
   greed = create_greed(60, 0, 60, 0, 20);
 }
@@ -255,12 +250,12 @@ void draw_rectangle_button(Button *button_rect)
 void draw_triangle_button(Button* button_triangle)
 {
   int x1, x2, x3, y1, y2, y3;
-  x1 = button_triangle->x_tr_1st;
-  y1 = button_triangle->y_tr_1st;
-  x2 = button_triangle->x_tr_2d;
-  y2 = button_triangle->y_tr_2d;
-  x3 = button_triangle->x_tr_3d;
-  y3 = button_triangle->y_tr_3d;
+  x1 = button_triangle->first_point.x;
+  y1 = button_triangle->first_point.y;
+  x2 = button_triangle->sec_point.x;
+  y2 = button_triangle->sec_point.y;
+  x3 = button_triangle->third_point.x;
+  y3 = button_triangle->third_point.y;
 
   glColor3f(1.0, 0.0, 0.3);
   glBegin(GL_TRIANGLES);               
@@ -284,10 +279,10 @@ void draw_triangle_button(Button* button_triangle)
 void draw_line_button(Button* button_line) 
 {
   int x1, y1, x2, y2;
-  x1 = button_line->x_line_1st;
-  y1 = button_line->y_line_1st;
-  x2 = button_line->x_line_2d;
-  y2 = button_line->y_line_2d;
+  x1 = button_line->point_line_first.x;
+  y1 = button_line->point_line_first.y;
+  x2 = button_line->point_line_sec.x;
+  y2 = button_line->point_line_sec.y;
  
   glColor3f(0.0,0.4,0.2); 
   glLineWidth(3.0); 
@@ -315,8 +310,8 @@ void draw_circle_button(Button* button_circle)
   double t = 0.0;
   double y = 0;
   int dif = 2;
-  cx = button_circle->cx;
-  cy = button_circle->cy;
+  cx = button_circle->point_circle.x;
+  cy = button_circle->point_circle.y;
   num_segments = button_circle->num_segments;
   r = button_circle->radius;
 
