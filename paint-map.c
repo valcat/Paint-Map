@@ -38,10 +38,8 @@ typedef struct Panel_border
 
 typedef struct Greed
 {
-  int x_vert;
-  int y_vert;
-  int x_hor;
-  int y_hor;
+  Point hor_point;
+  Point ver_point;
 } Greed;
 
 typedef struct Button
@@ -130,10 +128,10 @@ Button* create_button_circle(int x, int y, int radius, int num_segments)
 Greed* create_greed(int x_hor, int y_hor, int x_vert, int y_vert, int step)
 {
   Greed* greed = malloc(sizeof(Greed));
-  greed->x_hor = x_hor;
-  greed->y_hor = y_hor;
-  greed->x_vert = x_vert;
-  greed->y_vert = y_vert; 
+  greed->hor_point.x = x_hor;
+  greed->hor_point.y = y_hor;
+  greed->ver_point.x = x_vert;
+  greed->ver_point.y = y_vert; 
 
   return greed;
 }
@@ -188,10 +186,10 @@ void draw_greed(Greed* greed)
 {
   int x1, y1, x2, y2;
   int i = 0;
-  x1 = greed->x_hor;
-  y1 = greed->y_hor;
-  x2 = greed->x_hor;
-  y2 = greed->y_hor;
+  x1 = greed->hor_point.x;
+  y1 = greed->hor_point.y;
+  x2 = greed->ver_point.x;
+  y2 = greed->ver_point.y;
 
   int num_lines = WIDTH_WINDOW / STEP;
 
