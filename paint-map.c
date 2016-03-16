@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include <math.h>
 
-#define M_PI 3.14159265358979323846
 const int HEIGHT_WINDOW = 800;
 const int WIDTH_WINDOW = 800;
 const int PANEL_BORD_PADDING = 60;
@@ -67,6 +66,8 @@ typedef struct Button
   int num_segments;
   Figure figure;
 } Button;
+
+Button* coordinates[10];
 
 Panel_border* border = NULL;
 Button* button_rect = NULL;
@@ -146,10 +147,16 @@ Greed* create_greed(int x_hor, int y_hor, int x_vert, int y_vert, int step)
 void init(void)
 {
   border = create_panel_border(0, 0, 60, 800);
-  button_rect = create_button_rect(20, 740, 20, 20);
+
+  button_rect = create_button_rect(20, 720, 20, 20);
   button_triangle = create_button_triangle(30, 680, 20, 660, 40, 660);
   button_line = create_button_line(20, 600, 40, 620);
   button_circle = create_button_circle(30, 550, 10, 360);
+  coordinates[0] = button_rect;
+  coordinates[1] = button_triangle;
+  coordinates[2] = button_line;
+  coordinates[3] = button_circle;
+
   greed = create_greed(60, 0, 60, 0, 20);
 }
 
@@ -233,7 +240,8 @@ void draw_rectangle_button(Button *button_rect)
     glVertex2f(x, y + height);
   glEnd();
 
-  glColor3f(0.0, 0.0, 0.0);
+  glColor3f(1.0, 1.0, 1.0);
+  glLineWidth(4.0);
   glBegin(GL_LINE_LOOP);
     glVertex2f(x, y);               
     glVertex2f(x + width, y);         
@@ -261,7 +269,8 @@ void draw_triangle_button(Button* button_triangle)
     glVertex2f(x3, y3);    
   glEnd();
 
-  glColor3f(0.0, 0.0, 0.0);
+  glColor3f(1.0, 1.0, 1.0);
+  glLineWidth(4.0);
   glBegin(GL_LINE_LOOP);
     glVertex2f(x2, y2);               
     glVertex2f(x3, y3);         
@@ -281,14 +290,14 @@ void draw_line_button(Button* button_line)
   y2 = button_line->y_line_2d;
  
   glColor3f(0.0,0.4,0.2); 
-  glPointSize(3.0);  
+  glLineWidth(3.0); 
   glBegin(GL_LINES);
     glVertex2d(x1, y1);
     glVertex2d(x2, y2);
   glEnd();
 
-  glColor3f(0.0, 0.0, 0.0);
-  glPointSize(8.0);
+  glColor3f(1.0, 1.0, 1.0);
+  glLineWidth(4.0);
   glBegin(GL_LINE_LOOP);
     glVertex2f(x1, y1);               
     glVertex2f(x1 + STEP, y1);         
@@ -305,6 +314,7 @@ void draw_circle_button(Button* button_circle)
   double theta, c, s, x;
   double t = 0.0;
   double y = 0;
+  int dif = 2;
   cx = button_circle->cx;
   cy = button_circle->cy;
   num_segments = button_circle->num_segments;
@@ -327,18 +337,31 @@ void draw_circle_button(Button* button_circle)
   } 
   glEnd();
 
-glColor3f(0.0, 0.0, 0.0);
-  glPointSize(8.0);
+  glColor3f(1.0, 1.0, 1.0);
+  glLineWidth(4.0);
   glBegin(GL_LINE_LOOP);
-    glVertex2f(cx - half_step, cy - half_step);               
-    glVertex2f(cx + half_step, cy - half_step);         
-    glVertex2f(cx + half_step, cy + half_step);  
-    glVertex2f(cx - half_step, cy + half_step);
+    glVertex2f(cx - half_step - dif, cy - half_step - dif);               
+    glVertex2f(cx + half_step + dif, cy - half_step - dif);         
+    glVertex2f(cx + half_step + dif, cy + half_step + dif);  
+    glVertex2f(cx - half_step - dif, cy + half_step + dif);
   glEnd();
-
   glFlush();
   glutSwapBuffers();
 }
+
+void drawBitmapText(char *string, int x, int y) 
+{  
+  char *c;
+  glRasterPos2f(x, y);
+
+  for (c = string; *c != '\0'; c++) 
+  {
+    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+  }
+  glFlush();
+  glutSwapBuffers();
+}
+
 
 void draw_buttons(void)
 {
@@ -356,6 +379,8 @@ void draw(void)
   //draw working window and panel with set of tools
   draw_greed(greed);
   draw_panel(border);
+  glColor3f(0, 0, 0);
+  drawBitmapText("Tools", 2, 770);
   draw_buttons();
 }
 
@@ -390,6 +415,7 @@ void draw_line2(int x1, int y1)
   glutSwapBuffers();
 } 
 
+
 void mouse(int button, int state, int x, int y)
 {
   int new_y = HEIGHT_WINDOW - y;
@@ -403,7 +429,6 @@ void mouse(int button, int state, int x, int y)
     case 1:
       if (x > PANEL_BORD_PADDING) {
         draw_rectangle2(x, new_y);
-        printf("Yes\n");
       }
       break;
     case 2:
