@@ -3,11 +3,12 @@
 #include <GL/glx.h>    
 #include <GL/gl.h>
 #include <GL/glut.h>
+#include "GL/glu.h"
 #include <stdbool.h>
 #include <math.h>
 
+const int WIDTH_WINDOW = 1000;
 const int HEIGHT_WINDOW = 800;
-const int WIDTH_WINDOW = 800;
 const int PANEL_BORD_PADDING = 60;
 const char* WINDOW_NAME = "CAT-MAP";
 const int STEP = 20;
@@ -73,8 +74,8 @@ Panel_border* create_panel_border(int x, int y, int width, int height)
   Panel_border* border = malloc(sizeof(Panel_border));
   border->rect.point.x = x;
   border->rect.point.y = y;
-  border->rect.width= width;
-  border->rect.height= height;
+  border->rect.width = width;
+  border->rect.height = height;
 
   return border;
 }
@@ -95,7 +96,7 @@ Button* create_button_triangle(int x1, int y1, int x2, int y2, int x3,  int y3)
   Button* button_triangle = malloc(sizeof(Button));
   button_triangle->first_point.x = x1;
   button_triangle->first_point.y = y1;
-  button_triangle->sec_point.x= x2;
+  button_triangle->sec_point.x = x2;
   button_triangle->sec_point.y = y2;
   button_triangle->third_point.x = x3;
   button_triangle->third_point.y = y3;
@@ -138,7 +139,7 @@ Greed* create_greed(int x_hor, int y_hor, int x_vert, int y_vert, int step)
 
 void init(void)
 {
-  border = create_panel_border(0, 0, 60, 800);
+  border = create_panel_border(0, 0, 60, HEIGHT_WINDOW);
 
   button_rect = create_button_rect(20, 720, 20, 20);
   button_triangle = create_button_triangle(30, 680, 20, 660, 40, 660);
@@ -148,17 +149,17 @@ void init(void)
   coordinates[1] = button_triangle;
   coordinates[2] = button_line;
   coordinates[3] = button_circle;
-  printf("x %d\n", coordinates[0]->rect.point.x);
 
   greed = create_greed(60, 0, 60, 0, 20);
 }
 
 void reshape(int width, int height)
 {
-  glViewport(0, 0, width, height);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
+  glViewport(0, 0, width, height);
+  gluOrtho2D(0, WIDTH_WINDOW, 0, HEIGHT_WINDOW);
+  //glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
 }
@@ -191,10 +192,12 @@ void draw_greed(Greed* greed)
   x2 = greed->ver_point.x;
   y2 = greed->ver_point.y;
 
-  int num_lines = WIDTH_WINDOW / STEP;
+  int num_lines_width = WIDTH_WINDOW / STEP;
+  int num_lines_height = HEIGHT_WINDOW / STEP;
+
 
   //vertical lines
-  for (i = 0; i < num_lines; i++) {
+  for (i = 0; i < num_lines_width; i++) {
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1);
     glBegin(GL_LINES);
@@ -204,8 +207,9 @@ void draw_greed(Greed* greed)
     x1 = x1 + STEP;
     glFlush();
   }
+  printf("width lines %d\n", num_lines_width);
   //horizontal lines
-  for (i = 0; i < num_lines; i++) {
+  for (i = 0; i < num_lines_height; i++) {
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1);
     glBegin(GL_LINES);
@@ -355,7 +359,6 @@ void drawBitmapText(char *string, int x, int y)
   glutSwapBuffers();
 }
 
-
 void draw_buttons(void)
 {
   draw_rectangle_button(button_rect);
@@ -435,7 +438,7 @@ int main(int argc, char *argv[])
   init();
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH);
-  glutInitWindowSize(HEIGHT_WINDOW, WIDTH_WINDOW);
+  glutInitWindowSize(WIDTH_WINDOW, HEIGHT_WINDOW);
   glutInitWindowPosition(0, 0);
   glutCreateWindow(WINDOW_NAME);
   glutReshapeFunc(reshape);
