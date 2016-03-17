@@ -12,6 +12,7 @@ const int HEIGHT_WINDOW = 800;
 const int PANEL_BORD_PADDING = 60;
 const char* WINDOW_NAME = "CAT-MAP";
 const int STEP = 20;
+const int side_of_figure = 20;
 int flag = 0;
 
 typedef enum Figure 
@@ -57,7 +58,6 @@ typedef struct Button
   Point point_circle;
   int radius;
   int num_segments;
-  Figure figure;
 } Button;
 
 Button* coordinates[10];
@@ -158,6 +158,7 @@ void reshape(int width, int height)
   if (width < 1000 || height < 800) {
     glutReshapeWindow( 1000, 800);
   }
+
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glViewport(0, 0, width, height);
@@ -209,7 +210,6 @@ void draw_greed(Greed* greed)
     x1 = x1 + STEP;
     glFlush();
   }
-  printf("width lines %d\n", num_lines_width);
   //horizontal lines
   for (i = 0; i < num_lines_height; i++) {
     glColor3f(0.8f, 0.8f, 0.8f);
@@ -413,26 +413,32 @@ void draw_line2(int x1, int y1)
   glutSwapBuffers();
 } 
 
+Figure check_button(int x, int y)
+{
+  Figure figure;
+  if (y > button_rect->rect.point.y && y < (button_rect->rect.point.y + side_of_figure)) {
+      figure = RECTANGLE;
+    } if (y > button_triangle->sec_point.y && y < button_triangle->first_point.y) {
+      figure = TRIANGLE;
+    } if (y > button_line->point_line_first.y && y < button_line->point_line_sec.y) {
+      figure = LINE;
+    } else if(y > button_circle->point_circle.y - (side_of_figure / 2) && y < button_circle->point_circle.y + (side_of_figure / 2)) {
+      figure = CIRCLE;
+    }
+
+  return figure;
+}
 
 void mouse(int button, int state, int x, int y)
 {
+  
   int new_y = HEIGHT_WINDOW - y;
-  printf("x - %d\n", x);
-  printf("y - %d\n", new_y);
+  int beginig_x = 20;
+  int end_x = 40;
 
-  if ((x >= 20) && (x <= 40) && (new_y >= 740) && (new_y <= 760)) {
-    flag = 1;
-  }
-  switch (flag) {
-    case 1:
-      if (x > PANEL_BORD_PADDING) {
-        draw_rectangle2(x, new_y);
-      }
-      break;
-    case 2:
-      draw_rectangle2(x, new_y);
-      break;
-  }  
+   if (x > beginig_x && x < end_x) {
+    check_button(x, new_y);   
+  } 
 }
 
 int main(int argc, char *argv[])
