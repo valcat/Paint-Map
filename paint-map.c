@@ -155,11 +155,13 @@ void init(void)
 
 void reshape(int width, int height)
 {
+  if (width < 1000 || height < 800) {
+    glutReshapeWindow( 1000, 800);
+  }
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glViewport(0, 0, width, height);
   gluOrtho2D(0, WIDTH_WINDOW, 0, HEIGHT_WINDOW);
-  //glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
 }
