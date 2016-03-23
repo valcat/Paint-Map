@@ -368,6 +368,25 @@ void draw_rectangle2(int x, int y)
   glutSwapBuffers();
 }
 
+void draw_circle2(int x, int y, int radius)
+{
+  int i;
+  int triangleAmount = 20;
+  double twicePi = 2 * M_PI;
+
+  glColor3f(0.0, 1.0, 1.0);
+  glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(x, y); // center of circle
+    for (i = 0; i <= triangleAmount; i++) { 
+      glVertex2f(
+      x + (radius * cos(i * twicePi / triangleAmount)), 
+      y + (radius * sin(i * twicePi / triangleAmount)));
+    }
+  glEnd();
+  glFlush();
+  glutSwapBuffers();
+}
+
 //to delete
 void draw_line2(int x1, int y1) 
 {
@@ -398,16 +417,38 @@ Figure check_button(int x, int y)
   return figure;
 }
 
-void mouse(int button, int state, int x, int y)
+void init_flag(int x, int y) 
 {
-  
-  int new_y = HEIGHT_WINDOW - y;
   int beginig_x = 20;
   int end_x = 40;
+  Figure figure;
 
-   if (x > beginig_x && x < end_x) {
-    check_button(x, new_y);   
+  if (x > beginig_x && x < end_x) {
+    figure = check_button(x, y);   
   } 
+  if (figure == RECTANGLE) {
+    flag = 1;
+  } else if (figure == TRIANGLE) {
+    flag = 2;
+  } else if (figure == LINE) {
+    flag = 3;
+  } else if (figure == CIRCLE) {
+    flag = 4;
+  }
+}
+
+void mouse(int button, int state, int x, int y)
+{
+  int new_y = HEIGHT_WINDOW - y;
+  int a;
+  a = (x > 60);
+
+  init_flag(x, new_y); 
+  if (flag == 1 && a) {
+    draw_rectangle2(x, new_y);
+  } else if (flag == 4 && a) {
+    draw_circle2(x, new_y, 10);
+  }
 }
 
 int main(int argc, char *argv[])
