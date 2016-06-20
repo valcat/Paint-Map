@@ -8,12 +8,14 @@
 #include <math.h>
 
 const int WIDTH_WINDOW = 1000;
-const int HEIGHT_WINDOW = 800;
+const int HEIGHT_WINDOW =800;
 const int PANEL_BORD_PADDING = 60;
 const char* WINDOW_NAME = "CAT-MAP";
 const int STEP = 20;
 const int side_of_figure = 20;
 int flag = 0;
+int indicator = 0;
+int xf, yf, xs, ys;
 
 typedef enum Figure 
 {
@@ -54,6 +56,17 @@ typedef struct Button
   int num_segments;
 } Button;
 
+typedef struct Node_coordinates
+{
+  int x, y;
+  struct Node_coordinates *next;
+} Node_coordinates;
+
+typedef struct Linked_list
+{
+  Node_coordinates *head;
+} Linked_list;
+
 Button* coordinates[10];
 
 Panel_border* border = NULL;
@@ -61,6 +74,10 @@ Button* button_rect = NULL;
 Button* button_triangle = NULL;
 Button* button_line = NULL;
 Button* button_circle = NULL;
+Linked_list* linked_list = NULL;
+ Node_coordinates *store_nodes = NULL;
+
+Linked_list* create_linked_list();
 
 Panel_border* create_panel_border(int x, int y, int width, int height)
 {
@@ -131,6 +148,7 @@ void init(void)
   coordinates[1] = button_triangle;
   coordinates[2] = button_line;
   coordinates[3] = button_circle;
+  linked_list = create_linked_list();
 }
 
 void reshape(int width, int height)
@@ -138,13 +156,13 @@ void reshape(int width, int height)
   if (width < 1000 || height < 800) {
     glutReshapeWindow( 1000, 800);
   }
-
+  glViewport(0, 0, width, height);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glViewport(0, 0, width, height);
   gluOrtho2D(0, WIDTH_WINDOW, 0, HEIGHT_WINDOW);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
+  glutPostRedisplay();
 }
 
 void draw_panel(Panel_border* border)
@@ -189,6 +207,18 @@ void draw_grid()
       glVertex2d(WIDTH_WINDOW, y);
     glEnd();
     glFlush();
+
+   /* if (WIDTH_WINDOW > 1000) {
+      for (x = 0; x < W; x += STEP) {
+        glColor3f(0.8f, 0.8f, 0.8f);
+        glLineWidth(1);
+        glBegin(GL_LINES);
+          glVertex2d(x, 0);
+          glVertex2d(x, HEIGHT_WINDOW);
+        glEnd();
+        glFlush();
+  }
+    }*/
   }
 }
 
@@ -294,7 +324,7 @@ void draw_circle_button(Button* button_circle)
   x = r;
   half_step = STEP / 2;
 
-  glColor3f(0.0, 1.0, 1.0);
+  glColor3f(0.0, 0.4, 0.2);
   glBegin(GL_POLYGON);
   for (i = 0; i < num_segments; i++)
   {
@@ -349,6 +379,7 @@ void draw(void)
   glColor3f(0, 0, 0);
   drawBitmapText("Tools", 2, 770);
   draw_buttons();
+  glFlush();
 }
 
 //to delete
@@ -374,7 +405,7 @@ void draw_circle2(int x, int y, int radius)
   int triangleAmount = 20;
   double twicePi = 2 * M_PI;
 
-  glColor3f(0.0, 1.0, 1.0);
+  glColor3f(0.0, 0.4, 0.2);
   glBegin(GL_TRIANGLE_FAN);
     glVertex2f(x, y); // center of circle
     for (i = 0; i <= triangleAmount; i++) { 
@@ -388,18 +419,78 @@ void draw_circle2(int x, int y, int radius)
 }
 
 //to delete
-void draw_line2(int x1, int y1) 
+void draw_line2(int x1, int y1, int x2, int y2) 
 {
   glColor3f(0.0,0.4,0.2); 
   glPointSize(3.0);  
-
   glBegin(GL_LINES);
     glVertex2d(x1, y1);
-    glVertex2d(x1, y1);
+    glVertex2d(x2, y2);
   glEnd();
   glFlush();
   glutSwapBuffers();
 } 
+
+void add_node(Linked_list *linked_list, int x, int y)
+{
+ 
+ 
+  if (linked_list->head) {
+    Node_coordinates *IndexNode = linked_list->head;
+
+    while (IndexNode->next) {
+      IndexNode = IndexNode->next;
+    }
+    store_nodes = malloc(sizeof(Node_coordinates));
+    store_nodes->x = x; 
+    store_nodes->y = y;
+    store_nodes->next = NULL;
+    IndexNode->next = store_nodes;
+
+  } else {
+    store_nodes = malloc(sizeof(Node_coordinates));
+    store_nodes->x = x;
+    store_nodes->y = y;
+    store_nodes->next = NULL;
+    linked_list->head = store_nodes;
+  }
+
+}
+
+Linked_list* create_linked_list() 
+{
+  Linked_list *list = malloc(sizeof(Linked_list));
+  
+  return list;
+}
+
+void click_for_line(int button, int state, int x, int y)
+{ 
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    switch(indicator)
+    {
+      case 0:
+        xf = x;
+        yf = y;
+        indicator = 1;
+        draw_circle2(xf, yf, 5);
+        add_node(linked_list, xf, yf);
+        printf("y - %d\n", store_nodes->y);
+        printf("x - %d\n", store_nodes->x);
+        break;
+      case 1:
+        xs = x;
+        ys = y;
+        draw_circle2(xs, ys, 5);
+        draw_line2(xf, yf, xs, ys);
+        indicator = 0;
+        add_node(linked_list, xs, ys);
+        printf("y2 - %d\n", store_nodes->y);
+        printf("x2 - %d\n", store_nodes->x);
+        break;
+    }
+  }
+}
 
 Figure check_button(int x, int y)
 {
@@ -442,12 +533,14 @@ void mouse(int button, int state, int x, int y)
   int new_y = HEIGHT_WINDOW - y;
   int a;
   a = (x > 60);
-
+  printf(" XX - %d\n", x);
   init_flag(x, new_y); 
   if (flag == 1 && a) {
     draw_rectangle2(x, new_y);
   } else if (flag == 4 && a) {
     draw_circle2(x, new_y, 10);
+  } else if (flag == 3 && a) {
+    click_for_line(button, state, x, new_y);
   }
 }
 
@@ -459,8 +552,8 @@ int main(int argc, char *argv[])
   glutInitWindowSize(WIDTH_WINDOW, HEIGHT_WINDOW);
   glutInitWindowPosition(0, 0);
   glutCreateWindow(WINDOW_NAME);
-  glutReshapeFunc(reshape);
   glutDisplayFunc(draw);
+  glutReshapeFunc(reshape);
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glutMouseFunc(mouse);
   glutMainLoop();
