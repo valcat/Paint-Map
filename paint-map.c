@@ -17,6 +17,35 @@ int flag = 0;
 int indicator = 0;
 int xf, yf, xs, ys;
 
+//initial coordinates of border
+int X_BORD = 0;
+int Y_BORD = 0;
+int WIDTH_BORD = 60;
+//initial coordinates of buttons:
+//rectangle
+int X_RECT = 20;
+int Y_RECT = 720;
+int WIDTH_RECT = 20;
+int HEIGHT_RECT = 20;
+//triangle
+int X_FST_T = 30;
+int X_SND_T = 20;
+int X_TRD_T = 40;
+int Y_FST_T = 680;
+int Y_SCD_T = 660;
+int Y_TRD_T = 660;
+//line
+int X_FST_L = 20;
+int X_SND_L = 40;
+int Y_FST_L = 600;
+int Y_SND_L = 620;
+//circle
+int X_CRL = 30;
+int Y_CRL = 550;
+int RADS = 10;
+int NUM_SGMTS = 360;
+
+
 typedef enum Figure 
 {
   RECTANGLE, TRIANGLE, LINE, CIRCLE
@@ -75,7 +104,7 @@ Button* button_triangle = NULL;
 Button* button_line = NULL;
 Button* button_circle = NULL;
 Linked_list* linked_list = NULL;
- Node_coordinates *store_nodes = NULL;
+Node_coordinates *store_nodes = NULL;
 
 Linked_list* create_linked_list();
 
@@ -138,12 +167,13 @@ Button* create_button_circle(int x, int y, int radius, int num_segments)
 
 void init(void)
 {
-  border = create_panel_border(0, 0, 60, HEIGHT_WINDOW);
+  border = create_panel_border(X_BORD, Y_BORD, WIDTH_BORD, HEIGHT_WINDOW);
 
-  button_rect = create_button_rect(20, 720, 20, 20);
-  button_triangle = create_button_triangle(30, 680, 20, 660, 40, 660);
-  button_line = create_button_line(20, 600, 40, 620);
-  button_circle = create_button_circle(30, 550, 10, 360);
+  button_rect = create_button_rect(X_RECT, Y_RECT, WIDTH_RECT, HEIGHT_RECT);
+  button_triangle = create_button_triangle(X_FST, Y_FST, X_SND, Y_SCD, X_TRD, Y_TRD);
+  button_line = create_button_line(X_FST_L, Y_FST_L, X_SND_L, Y_SND_L);
+  button_circle = create_button_circle(X_CRL, Y_CRL, RADS, NUM_SGMTS);
+  
   coordinates[0] = button_rect;
   coordinates[1] = button_triangle;
   coordinates[2] = button_line;
@@ -153,13 +183,15 @@ void init(void)
 
 void reshape(int width, int height)
 {
-  if (width < 1000 || height < 800) {
-    glutReshapeWindow( 1000, 800);
+  //Minimum width of the window is WIDTH_WINDOW, minimum height is HEIGHT_WINDOW.
+  //Window's size can not be smaller than these values.
+  if (width < WIDTH_WINDOW || height < HEIGHT_WINDOW) {
+    glutReshapeWindow(WIDTH_WINDOW, HEIGHT_WINDOW);
   }
   glViewport(0, 0, width, height);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluOrtho2D(0, WIDTH_WINDOW, 0, HEIGHT_WINDOW);
+  gluOrtho2D(0, width, 0, height);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
   glutPostRedisplay();
@@ -207,18 +239,6 @@ void draw_grid()
       glVertex2d(WIDTH_WINDOW, y);
     glEnd();
     glFlush();
-
-   /* if (WIDTH_WINDOW > 1000) {
-      for (x = 0; x < W; x += STEP) {
-        glColor3f(0.8f, 0.8f, 0.8f);
-        glLineWidth(1);
-        glBegin(GL_LINES);
-          glVertex2d(x, 0);
-          glVertex2d(x, HEIGHT_WINDOW);
-        glEnd();
-        glFlush();
-  }
-    }*/
   }
 }
 
@@ -368,6 +388,7 @@ void draw_buttons(void)
   draw_circle_button(button_circle);
 }
 
+//function that draws window with all stuff
 void draw(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -382,8 +403,7 @@ void draw(void)
   glFlush();
 }
 
-//to delete
-void draw_rectangle2(int x, int y) 
+void draw_rectangle(int x, int y) 
 {
   int width = 20;
   int height = 20;
@@ -399,7 +419,7 @@ void draw_rectangle2(int x, int y)
   glutSwapBuffers();
 }
 
-void draw_circle2(int x, int y, int radius)
+void draw_circle(int x, int y, int radius)
 {
   int i;
   int triangleAmount = 20;
@@ -418,8 +438,7 @@ void draw_circle2(int x, int y, int radius)
   glutSwapBuffers();
 }
 
-//to delete
-void draw_line2(int x1, int y1, int x2, int y2) 
+void draw_line(int x1, int y1, int x2, int y2) 
 {
   glColor3f(0.0,0.4,0.2); 
   glPointSize(3.0);  
@@ -433,7 +452,6 @@ void draw_line2(int x1, int y1, int x2, int y2)
 
 void add_node(Linked_list *linked_list, int x, int y)
 {
- 
  
   if (linked_list->head) {
     Node_coordinates *IndexNode = linked_list->head;
@@ -473,18 +491,20 @@ void click_for_line(int button, int state, int x, int y)
         xf = x;
         yf = y;
         indicator = 1;
-        draw_circle2(xf, yf, 5);
+        draw_circle(xf, yf, 5);
         add_node(linked_list, xf, yf);
+        //check coordinates of the first point
         printf("y - %d\n", store_nodes->y);
         printf("x - %d\n", store_nodes->x);
         break;
       case 1:
         xs = x;
         ys = y;
-        draw_circle2(xs, ys, 5);
-        draw_line2(xf, yf, xs, ys);
+        draw_circle(xs, ys, 5);
+        draw_line(xf, yf, xs, ys);
         indicator = 0;
         add_node(linked_list, xs, ys);
+        //check coordinates of the second point
         printf("y2 - %d\n", store_nodes->y);
         printf("x2 - %d\n", store_nodes->x);
         break;
@@ -492,6 +512,7 @@ void click_for_line(int button, int state, int x, int y)
   }
 }
 
+//check what button was pressed
 Figure check_button(int x, int y)
 {
   Figure figure;
@@ -528,6 +549,7 @@ void init_flag(int x, int y)
   }
 }
 
+//draw figure what was chosen from the buttons
 void mouse(int button, int state, int x, int y)
 {
   int new_y = HEIGHT_WINDOW - y;
@@ -535,10 +557,11 @@ void mouse(int button, int state, int x, int y)
   a = (x > 60);
   printf(" XX - %d\n", x);
   init_flag(x, new_y); 
+
   if (flag == 1 && a) {
-    draw_rectangle2(x, new_y);
+    draw_rectangle(x, new_y);
   } else if (flag == 4 && a) {
-    draw_circle2(x, new_y, 10);
+    draw_circle(x, new_y, 10);
   } else if (flag == 3 && a) {
     click_for_line(button, state, x, new_y);
   }
