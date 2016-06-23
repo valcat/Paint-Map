@@ -17,33 +17,33 @@ int flag = 0;
 int indicator = 0;
 int xf, yf, xs, ys;
 
-//initial coordinates of border
-int X_BORD = 0;
-int Y_BORD = 0;
-int WIDTH_BORD = 60;
-//initial coordinates of buttons:
-//rectangle
-int X_RECT = 20;
-int Y_RECT = 720;
-int WIDTH_RECT = 20;
-int HEIGHT_RECT = 20;
-//triangle
-int X_FST_T = 30;
-int X_SND_T = 20;
-int X_TRD_T = 40;
-int Y_FST_T = 680;
-int Y_SCD_T = 660;
-int Y_TRD_T = 660;
-//line
-int X_FST_L = 20;
-int X_SND_L = 40;
-int Y_FST_L = 600;
-int Y_SND_L = 620;
-//circle
-int X_CRL = 30;
-int Y_CRL = 550;
-int RADS = 10;
-int NUM_SGMTS = 360;
+/* initial coordinates of border */
+const int X_BORD = 0;
+const int Y_BORD = 0;
+const int WIDTH_BORD = 60;
+/* initial coordinates of buttons: */
+/* rectangle */
+const int X_RECT = 20;
+const int Y_RECT = 720;
+const int WIDTH_RECT = 20;
+const int HEIGHT_RECT = 20;
+/* triangle */
+const int X_FST_T = 30;
+const int X_SND_T = 20;
+const int X_TRD_T = 40;
+const int Y_FST_T = 680;
+const int Y_SCD_T = 660;
+const int Y_TRD_T = 660;
+/* line */
+const int X_FST_L = 20;
+const int X_SND_L = 40;
+const int Y_FST_L = 600;
+const int Y_SND_L = 620;
+/* circle */
+const int X_CRL = 30;
+const int Y_CRL = 550;
+const int RADS = 10;
+const int NUM_SGMTS = 360;
 
 
 typedef enum Figure 
@@ -72,14 +72,14 @@ typedef struct Panel_border
 typedef struct Button
 {
   Rectangle rect;
-  //triangle
+  /* triangle */
   Point first_point;
   Point sec_point;
   Point third_point;
-  //line
+  /* line */
   Point point_line_first;
   Point point_line_sec;
-  //circle
+  /* circle */
   Point point_circle;
   int radius;
   int num_segments;
@@ -170,7 +170,7 @@ void init(void)
   border = create_panel_border(X_BORD, Y_BORD, WIDTH_BORD, HEIGHT_WINDOW);
 
   button_rect = create_button_rect(X_RECT, Y_RECT, WIDTH_RECT, HEIGHT_RECT);
-  button_triangle = create_button_triangle(X_FST, Y_FST, X_SND, Y_SCD, X_TRD, Y_TRD);
+  button_triangle = create_button_triangle(X_FST_T, Y_FST_T, X_SND_T, Y_SCD_T, X_TRD_T, Y_TRD_T);
   button_line = create_button_line(X_FST_L, Y_FST_L, X_SND_L, Y_SND_L);
   button_circle = create_button_circle(X_CRL, Y_CRL, RADS, NUM_SGMTS);
   
@@ -183,8 +183,8 @@ void init(void)
 
 void reshape(int width, int height)
 {
-  //Minimum width of the window is WIDTH_WINDOW, minimum height is HEIGHT_WINDOW.
-  //Window's size can not be smaller than these values.
+  /* Minimum width of the window is WIDTH_WINDOW, minimum height is HEIGHT_WINDOW.
+   * Window's size can not be smaller than these values. */
   if (width < WIDTH_WINDOW || height < HEIGHT_WINDOW) {
     glutReshapeWindow(WIDTH_WINDOW, HEIGHT_WINDOW);
   }
@@ -220,7 +220,7 @@ void draw_grid()
 {
   int x, y;
 
-  //vertical lines
+  /* vertical lines */
   for (x = 0; x < WIDTH_WINDOW; x += STEP) {
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1);
@@ -230,7 +230,7 @@ void draw_grid()
     glEnd();
     glFlush();
   }
-  //horizontal lines
+  /* horizontal lines */
   for (y = 0; y < HEIGHT_WINDOW; y += STEP) {
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1);
@@ -388,13 +388,13 @@ void draw_buttons(void)
   draw_circle_button(button_circle);
 }
 
-//function that draws window with all stuff
+/* function that draws window with all stuff */
 void draw(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
 
-  //draw working window and panel with set of tools
+  /* draw working window and panel with set of tools */
   draw_grid();
   draw_panel(border);
   glColor3f(0, 0, 0);
@@ -427,7 +427,8 @@ void draw_circle(int x, int y, int radius)
 
   glColor3f(0.0, 0.4, 0.2);
   glBegin(GL_TRIANGLE_FAN);
-    glVertex2f(x, y); // center of circle
+    /* center of circle */
+    glVertex2f(x, y); 
     for (i = 0; i <= triangleAmount; i++) { 
       glVertex2f(
       x + (radius * cos(i * twicePi / triangleAmount)), 
@@ -493,7 +494,7 @@ void click_for_line(int button, int state, int x, int y)
         indicator = 1;
         draw_circle(xf, yf, 5);
         add_node(linked_list, xf, yf);
-        //check coordinates of the first point
+        /* check coordinates of the first point */
         printf("y - %d\n", store_nodes->y);
         printf("x - %d\n", store_nodes->x);
         break;
@@ -504,7 +505,7 @@ void click_for_line(int button, int state, int x, int y)
         draw_line(xf, yf, xs, ys);
         indicator = 0;
         add_node(linked_list, xs, ys);
-        //check coordinates of the second point
+        /* check coordinates of the second point */
         printf("y2 - %d\n", store_nodes->y);
         printf("x2 - %d\n", store_nodes->x);
         break;
@@ -512,7 +513,7 @@ void click_for_line(int button, int state, int x, int y)
   }
 }
 
-//check what button was pressed
+/* check what button was pressed */
 Figure check_button(int x, int y)
 {
   Figure figure;
@@ -549,7 +550,7 @@ void init_flag(int x, int y)
   }
 }
 
-//draw figure what was chosen from the buttons
+/* draw figure what was chosen from the buttons */
 void mouse(int button, int state, int x, int y)
 {
   int new_y = HEIGHT_WINDOW - y;
