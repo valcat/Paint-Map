@@ -96,6 +96,8 @@ typedef struct Linked_list
   Node_coordinates *head;
 } Linked_list;
 
+Linked_list* createLinkedList();
+
 Button* coordinates[10];
 
 Panel_border* border = NULL;
@@ -106,9 +108,8 @@ Button* button_circle = NULL;
 Linked_list* linked_list = NULL;
 Node_coordinates *store_nodes = NULL;
 
-Linked_list* create_linked_list();
 
-Panel_border* create_panel_border(int x, int y, int width, int height)
+Panel_border* createPanelBorder(int x, int y, int width, int height)
 {
   Panel_border* border = malloc(sizeof(Panel_border));
   border->rect.point.x = x;
@@ -119,7 +120,7 @@ Panel_border* create_panel_border(int x, int y, int width, int height)
   return border;
 }
 
-Button* create_button_rect(int x, int y, int width, int height)
+Button* createButtonRect(int x, int y, int width, int height)
 {
   Button* button_rect = malloc(sizeof(Button));
   button_rect->rect.point.x = x;
@@ -130,7 +131,7 @@ Button* create_button_rect(int x, int y, int width, int height)
   return button_rect;
 }
 
-Button* create_button_triangle(int x1, int y1, int x2, int y2, int x3,  int y3)
+Button* createButtonTriangle(int x1, int y1, int x2, int y2, int x3,  int y3)
 {
   Button* button_triangle = malloc(sizeof(Button));
   button_triangle->first_point.x = x1;
@@ -143,7 +144,7 @@ Button* create_button_triangle(int x1, int y1, int x2, int y2, int x3,  int y3)
   return button_triangle;
 }
 
-Button* create_button_line(int x1, int y1, int x2, int y2)
+Button* createButtonLine(int x1, int y1, int x2, int y2)
 {
   Button* button_line = malloc(sizeof(Button));
   button_line->point_line_first.x = x1;
@@ -154,7 +155,7 @@ Button* create_button_line(int x1, int y1, int x2, int y2)
   return button_line;
 }
 
-Button* create_button_circle(int x, int y, int radius, int num_segments)
+Button* createButtonCircle(int x, int y, int radius, int num_segments)
 {
   Button* button_circle = malloc(sizeof(Button));
   button_circle->point_circle.x = x;
@@ -167,18 +168,18 @@ Button* create_button_circle(int x, int y, int radius, int num_segments)
 
 void init(void)
 {
-  border = create_panel_border(X_BORD, Y_BORD, WIDTH_BORD, HEIGHT_WINDOW);
+  border = createPanelBorder(X_BORD, Y_BORD, WIDTH_BORD, HEIGHT_WINDOW);
 
-  button_rect = create_button_rect(X_RECT, Y_RECT, WIDTH_RECT, HEIGHT_RECT);
-  button_triangle = create_button_triangle(X_FST_T, Y_FST_T, X_SND_T, Y_SCD_T, X_TRD_T, Y_TRD_T);
-  button_line = create_button_line(X_FST_L, Y_FST_L, X_SND_L, Y_SND_L);
-  button_circle = create_button_circle(X_CRL, Y_CRL, RADS, NUM_SGMTS);
+  button_rect = createButtonRect(X_RECT, Y_RECT, WIDTH_RECT, HEIGHT_RECT);
+  button_triangle = createButtonTriangle(X_FST_T, Y_FST_T, X_SND_T, Y_SCD_T, X_TRD_T, Y_TRD_T);
+  button_line = createButtonLine(X_FST_L, Y_FST_L, X_SND_L, Y_SND_L);
+  button_circle = createButtonCircle(X_CRL, Y_CRL, RADS, NUM_SGMTS);
   
   coordinates[0] = button_rect;
   coordinates[1] = button_triangle;
   coordinates[2] = button_line;
   coordinates[3] = button_circle;
-  linked_list = create_linked_list();
+  linked_list = createLinkedList();
 }
 
 void reshape(int width, int height)
@@ -197,7 +198,7 @@ void reshape(int width, int height)
   glutPostRedisplay();
 }
 
-void draw_panel(Panel_border* border)
+void drawPanel(Panel_border* border)
 {
   int x, y, width, height;
   x = border->rect.point.x;
@@ -216,7 +217,7 @@ void draw_panel(Panel_border* border)
   glutSwapBuffers();
 }
 
-void draw_grid()
+void drawGrid()
 {
   int x, y;
 
@@ -242,7 +243,7 @@ void draw_grid()
   }
 }
 
-void draw_rectangle_button(Button *button_rect) 
+void drawRectangleButton(Button *button_rect) 
 {
   int x, y, width, height;
   x = button_rect->rect.point.x;
@@ -270,7 +271,7 @@ void draw_rectangle_button(Button *button_rect)
   glutSwapBuffers();
 }
 
-void draw_triangle_button(Button* button_triangle)
+void drawTriangleButton(Button* button_triangle)
 {
   int x1, x2, x3, y1, y2, y3;
   x1 = button_triangle->first_point.x;
@@ -299,7 +300,7 @@ void draw_triangle_button(Button* button_triangle)
   glutSwapBuffers();
 }
 
-void draw_line_button(Button* button_line) 
+void drawLineButton(Button* button_line) 
 {
   int x1, y1, x2, y2;
   x1 = button_line->point_line_first.x;
@@ -326,7 +327,7 @@ void draw_line_button(Button* button_line)
   glutSwapBuffers();
 } 
 
-void draw_circle_button(Button* button_circle)
+void drawCircleButton(Button* button_circle)
 {
   int i, cx, cy, num_segments, r, half_step;
   double theta, c, s, x;
@@ -380,12 +381,12 @@ void drawBitmapText(char *string, int x, int y)
   glutSwapBuffers();
 }
 
-void draw_buttons(void)
+void drawButtons(void)
 {
-  draw_rectangle_button(button_rect);
-  draw_triangle_button(button_triangle);
-  draw_line_button(button_line);
-  draw_circle_button(button_circle);
+  drawRectangleButton(button_rect);
+  drawTriangleButton(button_triangle);
+  drawLineButton(button_line);
+  drawCircleButton(button_circle);
 }
 
 /* function that draws window with all stuff */
@@ -395,15 +396,15 @@ void draw(void)
   glLoadIdentity();
 
   /* draw working window and panel with set of tools */
-  draw_grid();
-  draw_panel(border);
+  drawGrid();
+  drawPanel(border);
   glColor3f(0, 0, 0);
   drawBitmapText("Tools", 2, 770);
-  draw_buttons();
+  drawButtons();
   glFlush();
 }
 
-void draw_rectangle(int x, int y) 
+void drawRectangle(int x, int y) 
 {
   int width = 20;
   int height = 20;
@@ -419,7 +420,7 @@ void draw_rectangle(int x, int y)
   glutSwapBuffers();
 }
 
-void draw_circle(int x, int y, int radius)
+void drawCircle(int x, int y, int radius)
 {
   int i;
   int triangleAmount = 20;
@@ -439,7 +440,7 @@ void draw_circle(int x, int y, int radius)
   glutSwapBuffers();
 }
 
-void draw_line(int x1, int y1, int x2, int y2) 
+void drawLine(int x1, int y1, int x2, int y2) 
 {
   glColor3f(0.0,0.4,0.2); 
   glPointSize(3.0);  
@@ -451,7 +452,7 @@ void draw_line(int x1, int y1, int x2, int y2)
   glutSwapBuffers();
 } 
 
-void add_node(Linked_list *linked_list, int x, int y)
+void addNode(Linked_list *linked_list, int x, int y)
 {
  
   if (linked_list->head) {
@@ -476,14 +477,14 @@ void add_node(Linked_list *linked_list, int x, int y)
 
 }
 
-Linked_list* create_linked_list() 
+Linked_list* createLinkedList() 
 {
   Linked_list *list = malloc(sizeof(Linked_list));
   
   return list;
 }
 
-void click_for_line(int button, int state, int x, int y)
+void clickForLine(int button, int state, int x, int y)
 { 
   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
     switch(indicator)
@@ -492,8 +493,8 @@ void click_for_line(int button, int state, int x, int y)
         xf = x;
         yf = y;
         indicator = 1;
-        draw_circle(xf, yf, 5);
-        add_node(linked_list, xf, yf);
+        drawCircle(xf, yf, 5);
+        addNode(linked_list, xf, yf);
         /* check coordinates of the first point */
         printf("y - %d\n", store_nodes->y);
         printf("x - %d\n", store_nodes->x);
@@ -501,10 +502,10 @@ void click_for_line(int button, int state, int x, int y)
       case 1:
         xs = x;
         ys = y;
-        draw_circle(xs, ys, 5);
-        draw_line(xf, yf, xs, ys);
+        drawCircle(xs, ys, 5);
+        drawLine(xf, yf, xs, ys);
         indicator = 0;
-        add_node(linked_list, xs, ys);
+        addNode(linked_list, xs, ys);
         /* check coordinates of the second point */
         printf("y2 - %d\n", store_nodes->y);
         printf("x2 - %d\n", store_nodes->x);
@@ -514,7 +515,7 @@ void click_for_line(int button, int state, int x, int y)
 }
 
 /* check what button was pressed */
-Figure check_button(int x, int y)
+Figure checkButton(int x, int y)
 {
   Figure figure;
   if (y > button_rect->rect.point.y && y < (button_rect->rect.point.y + side_of_figure)) {
@@ -530,14 +531,14 @@ Figure check_button(int x, int y)
   return figure;
 }
 
-void init_flag(int x, int y) 
+void initFlag(int x, int y) 
 {
   int beginig_x = 20;
   int end_x = 40;
   Figure figure;
 
   if (x > beginig_x && x < end_x) {
-    figure = check_button(x, y);   
+    figure = checkButton(x, y);   
   } 
   if (figure == RECTANGLE) {
     flag = 1;
@@ -557,14 +558,14 @@ void mouse(int button, int state, int x, int y)
   int a;
   a = (x > 60);
   printf(" XX - %d\n", x);
-  init_flag(x, new_y); 
+  initFlag(x, new_y); 
 
   if (flag == 1 && a) {
-    draw_rectangle(x, new_y);
+    drawRectangle(x, new_y);
   } else if (flag == 4 && a) {
-    draw_circle(x, new_y, 10);
+    drawCircle(x, new_y, 10);
   } else if (flag == 3 && a) {
-    click_for_line(button, state, x, new_y);
+    clickForLine(button, state, x, new_y);
   }
 }
 
