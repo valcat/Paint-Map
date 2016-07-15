@@ -6,9 +6,10 @@
 #include "GL/glu.h"
 #include <stdbool.h>
 #include <math.h>
+#include "linked_list.h"
 
 const int WIDTH_WINDOW = 1000;
-const int HEIGHT_WINDOW =800;
+const int HEIGHT_WINDOW = 800;
 const int PANEL_BORD_PADDING = 60;
 const char* WINDOW_NAME = "CAT-MAP";
 const int STEP = 20;
@@ -85,18 +86,6 @@ typedef struct Button
   int num_segments;
 } Button;
 
-typedef struct Node_coordinates
-{
-  int x, y;
-  struct Node_coordinates *next;
-} Node_coordinates;
-
-typedef struct Linked_list
-{
-  Node_coordinates *head;
-} Linked_list;
-
-Linked_list* createLinkedList();
 
 Button* coordinates[10];
 
@@ -106,8 +95,6 @@ Button* button_triangle = NULL;
 Button* button_line = NULL;
 Button* button_circle = NULL;
 Linked_list* linked_list = NULL;
-Node_coordinates *store_nodes = NULL;
-
 
 Panel_border* createPanelBorder(int x, int y, int width, int height)
 {
@@ -450,38 +437,6 @@ void drawLine(int x1, int y1, int x2, int y2)
   glEnd();
   glFlush();
   glutSwapBuffers();
-} 
-
-void addNode(Linked_list *linked_list, int x, int y)
-{
- 
-  if (linked_list->head) {
-    Node_coordinates *IndexNode = linked_list->head;
-
-    while (IndexNode->next) {
-      IndexNode = IndexNode->next;
-    }
-    store_nodes = malloc(sizeof(Node_coordinates));
-    store_nodes->x = x; 
-    store_nodes->y = y;
-    store_nodes->next = NULL;
-    IndexNode->next = store_nodes;
-
-  } else {
-    store_nodes = malloc(sizeof(Node_coordinates));
-    store_nodes->x = x;
-    store_nodes->y = y;
-    store_nodes->next = NULL;
-    linked_list->head = store_nodes;
-  }
-
-}
-
-Linked_list* createLinkedList() 
-{
-  Linked_list *list = malloc(sizeof(Linked_list));
-  
-  return list;
 }
 
 void clickForLine(int button, int state, int x, int y)
@@ -495,9 +450,6 @@ void clickForLine(int button, int state, int x, int y)
         indicator = 1;
         drawCircle(xf, yf, 5);
         addNode(linked_list, xf, yf);
-        /* check coordinates of the first point */
-        printf("y - %d\n", store_nodes->y);
-        printf("x - %d\n", store_nodes->x);
         break;
       case 1:
         xs = x;
@@ -506,9 +458,6 @@ void clickForLine(int button, int state, int x, int y)
         drawLine(xf, yf, xs, ys);
         indicator = 0;
         addNode(linked_list, xs, ys);
-        /* check coordinates of the second point */
-        printf("y2 - %d\n", store_nodes->y);
-        printf("x2 - %d\n", store_nodes->x);
         break;
     }
   }
@@ -521,11 +470,11 @@ Figure checkButton(int x, int y)
   if (y > button_rect->rect.point.y && y < (button_rect->rect.point.y + side_of_figure)) {
       figure = RECTANGLE;
     } if (y > button_triangle->sec_point.y && y < button_triangle->first_point.y) {
-      figure = TRIANGLE;
+        figure = TRIANGLE;
     } if (y > button_line->point_line_first.y && y < button_line->point_line_sec.y) {
-      figure = LINE;
+        figure = LINE;
     } else if(y > button_circle->point_circle.y - (side_of_figure / 2) && y < button_circle->point_circle.y + (side_of_figure / 2)) {
-      figure = CIRCLE;
+        figure = CIRCLE;
     }
 
   return figure;
@@ -586,6 +535,8 @@ int main(int argc, char *argv[])
   free(button_rect);
   free(button_triangle);
   free(button_line);
+  freeNodes(linked_list);
+  free(linked_list);
 
   return 0;
 }
