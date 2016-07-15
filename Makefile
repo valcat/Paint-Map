@@ -1,5 +1,7 @@
 build: paint-map
+
 paint-map: paint-map.c
-	gcc paint-map.c -lGL -lGLU -lglut -lm -o paint-map
+	gcc paint-map.c linked_list.c -lGL -lGLU -lglut -lm -o paint-map
+
 paint-map-darvin: paint-map.c
-	gcc paint-map.c -framework carbon -framework OpenGL -framework GLUT -Wno-deprecated -o paint-map 
+	gcc paint-map.c linked_list.c -framework carbon -framework OpenGL -framework GLUT -Wno-deprecated -o paint-map 
