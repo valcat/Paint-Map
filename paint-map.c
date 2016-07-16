@@ -17,6 +17,8 @@ const int side_of_figure = 20;
 int flag = 0;
 int indicator = 0;
 int xf, yf, xs, ys;
+int width_indicator = 0;
+int height_indicator = 0;
 
 /* initial coordinates of border */
 const int X_BORD = 0;
@@ -183,6 +185,8 @@ void reshape(int width, int height)
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
   glutPostRedisplay();
+  width_indicator = width;
+  height_indicator = height;
 }
 
 void drawPanel(Panel_border* border)
@@ -209,22 +213,22 @@ void drawGrid()
   int x, y;
 
   /* vertical lines */
-  for (x = 0; x < WIDTH_WINDOW; x += STEP) {
+  for (x = 0; x < width_indicator; x += STEP) {
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1);
     glBegin(GL_LINES);
       glVertex2d(x, 0);
-      glVertex2d(x, HEIGHT_WINDOW);
+      glVertex2d(x, height_indicator);
     glEnd();
     glFlush();
   }
   /* horizontal lines */
-  for (y = 0; y < HEIGHT_WINDOW; y += STEP) {
+  for (y = 0; y < height_indicator; y += STEP) {
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1);
     glBegin(GL_LINES);
       glVertex2d(0, y);
-      glVertex2d(WIDTH_WINDOW, y);
+      glVertex2d(width_indicator, y);
     glEnd();
     glFlush();
   }
