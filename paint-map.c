@@ -157,7 +157,7 @@ Button* createButtonCircle(int x, int y, int radius, int num_segments)
 
 void init(void)
 {
-  border = createPanelBorder(X_BORD, Y_BORD, WIDTH_BORD, HEIGHT_WINDOW);
+  border = createPanelBorder(X_BORD, HEIGHT_WINDOW, WIDTH_BORD, HEIGHT_WINDOW);
 
   button_rect = createButtonRect(X_RECT, Y_RECT, WIDTH_RECT, HEIGHT_RECT);
   button_triangle = createButtonTriangle(X_FST_T, Y_FST_T, X_SND_T, Y_SCD_T, X_TRD_T, Y_TRD_T);
@@ -173,18 +173,12 @@ void init(void)
 
 void reshape(int width, int height)
 {
-  /* Minimum width of the window is WIDTH_WINDOW, minimum height is HEIGHT_WINDOW.
-   * Window's size can not be smaller than these values. */
-  if (width < WIDTH_WINDOW || height < HEIGHT_WINDOW) {
-    glutReshapeWindow(WIDTH_WINDOW, HEIGHT_WINDOW);
-  }
   glViewport(0, 0, width, height);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   gluOrtho2D(0, width, 0, height);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
-  glutPostRedisplay();
   width_indicator = width;
   height_indicator = height;
 }
@@ -201,8 +195,8 @@ void drawPanel(Panel_border* border)
   glBegin(GL_QUADS);              
     glVertex2f(x, y);               
     glVertex2f(x + width, y);         
-    glVertex2f(x + width, y + height);  
-    glVertex2f(x, y + height);
+    glVertex2f(x + width, height_indicator - y);  
+    glVertex2f(x, height_indicator - y);
   glEnd();
   glFlush();
   glutSwapBuffers();
@@ -507,10 +501,11 @@ void initFlag(int x, int y)
 /* draw figure what was chosen from the buttons */
 void mouse(int button, int state, int x, int y)
 {
-  int new_y = HEIGHT_WINDOW - y;
+  int new_y = height_indicator - y;
   int a;
   a = (x > 60);
   printf(" XX - %d\n", x);
+  printf("YY - %d\n", new_y);
   initFlag(x, new_y); 
 
   if (flag == 1 && a) {
