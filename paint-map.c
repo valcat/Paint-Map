@@ -9,10 +9,11 @@
 #include "linked_list.h"
 
 const int WIDTH_WINDOW = 1000;
-const int HEIGHT_WINDOW = 800;
+const int HEIGHT_WINDOW = 1000;
 const int PANEL_BORD_PADDING = 60;
 const char* WINDOW_NAME = "CAT-MAP";
 const int STEP = 20;
+const int MIN_HEIGHT_WINDOW = 700;
 const int side_of_figure = 20;
 int flag = 0;
 int indicator = 0;
@@ -27,24 +28,24 @@ const int WIDTH_BORD = 60;
 /* initial coordinates of buttons: */
 /* rectangle */
 const int X_RECT = 20;
-const int Y_RECT = 720;
+const int Y_RECT = 630;
 const int WIDTH_RECT = 20;
 const int HEIGHT_RECT = 20;
 /* triangle */
 const int X_FST_T = 30;
 const int X_SND_T = 20;
 const int X_TRD_T = 40;
-const int Y_FST_T = 680;
-const int Y_SCD_T = 660;
-const int Y_TRD_T = 660;
+const int Y_FST_T = 590;
+const int Y_SCD_T = 570;
+const int Y_TRD_T = 570;
 /* line */
 const int X_FST_L = 20;
 const int X_SND_L = 40;
-const int Y_FST_L = 600;
-const int Y_SND_L = 620;
+const int Y_FST_L = 510;
+const int Y_SND_L = 530;
 /* circle */
 const int X_CRL = 30;
-const int Y_CRL = 550;
+const int Y_CRL = 460;
 const int RADS = 10;
 const int NUM_SGMTS = 360;
 
@@ -98,13 +99,12 @@ Button* button_line = NULL;
 Button* button_circle = NULL;
 Linked_list* linked_list = NULL;
 
-Panel_border* createPanelBorder(int x, int y, int width, int height)
+Panel_border* createPanelBorder(int x, int y, int width)
 {
   Panel_border* border = malloc(sizeof(Panel_border));
   border->rect.point.x = x;
   border->rect.point.y = y;
   border->rect.width = width;
-  border->rect.height = height;
 
   return border;
 }
@@ -157,7 +157,7 @@ Button* createButtonCircle(int x, int y, int radius, int num_segments)
 
 void init(void)
 {
-  border = createPanelBorder(X_BORD, HEIGHT_WINDOW, WIDTH_BORD, HEIGHT_WINDOW);
+  border = createPanelBorder(X_BORD, Y_BORD, WIDTH_BORD);
 
   button_rect = createButtonRect(X_RECT, Y_RECT, WIDTH_RECT, HEIGHT_RECT);
   button_triangle = createButtonTriangle(X_FST_T, Y_FST_T, X_SND_T, Y_SCD_T, X_TRD_T, Y_TRD_T);
@@ -173,6 +173,11 @@ void init(void)
 
 void reshape(int width, int height)
 {
+  /* Minimum height is MIN_HEIGHT_WINDOW.
+   * Window's size can not be smaller than this value. */
+  if (height < MIN_HEIGHT_WINDOW) {
+    glutReshapeWindow(width_indicator, MIN_HEIGHT_WINDOW);
+  }
   glViewport(0, 0, width, height);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -189,17 +194,19 @@ void drawPanel(Panel_border* border)
   x = border->rect.point.x;
   y = border->rect.point.y;
   width = border->rect.width;
-  height = border->rect.height;
+  height = height_indicator;
 
   glColor3f(0.9, 0.9, 0.9);
   glBegin(GL_QUADS);              
     glVertex2f(x, y);               
     glVertex2f(x + width, y);         
-    glVertex2f(x + width, height_indicator - y);  
-    glVertex2f(x, height_indicator - y);
+    glVertex2f(x + width, height);  
+    glVertex2f(x, height);
   glEnd();
   glFlush();
   glutSwapBuffers();
+  printf(" y2 - %d\n", y);
+  printf("height - %d\n", height);
 }
 
 void drawGrid()
@@ -384,7 +391,7 @@ void draw(void)
   drawGrid();
   drawPanel(border);
   glColor3f(0, 0, 0);
-  drawBitmapText("Tools", 2, 770);
+  drawBitmapText("Tools", 2, 680);
   drawButtons();
   glFlush();
 }
