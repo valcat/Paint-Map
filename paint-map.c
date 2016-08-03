@@ -445,9 +445,10 @@ void drawLine(int x1, int y1, int x2, int y2)
 }
 
 void clickForLine(int button, int state, int x, int y)
-{ if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+{ 
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
     drawCircle(x, y, 5);
-    addNode(linked_list, xf, yf);
+    addNode(linked_list, x, y);
     size_t number_of_nodes = count(linked_list);
 
     if (number_of_nodes > 1) {
