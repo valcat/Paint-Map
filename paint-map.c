@@ -445,25 +445,14 @@ void drawLine(int x1, int y1, int x2, int y2)
 }
 
 void clickForLine(int button, int state, int x, int y)
-{ 
-  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-    switch(indicator)
-    {
-      case 0:
-        xf = x;
-        yf = y;
-        indicator = 1;
-        drawCircle(xf, yf, 5);
-        addNode(linked_list, xf, yf);
-        break;
-      case 1:
-        xs = x;
-        ys = y;
-        drawCircle(xs, ys, 5);
-        drawLine(xf, yf, xs, ys);
-        indicator = 0;
-        addNode(linked_list, xs, ys);
-        break;
+{ if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    drawCircle(x, y, 5);
+    addNode(linked_list, xf, yf);
+    size_t number_of_nodes = count(linked_list);
+
+    if (number_of_nodes > 1) {
+      printf("count - %zu\n", number_of_nodes);
+      //draw lines
     }
   }
 }
@@ -473,13 +462,17 @@ Figure checkButton(int x, int y)
 {
   Figure figure;
   if (y > button_rect->rect.point.y && y < (button_rect->rect.point.y + side_of_figure)) {
-      figure = RECTANGLE;
-    } if (y > button_triangle->sec_point.y && y < button_triangle->first_point.y) {
-        figure = TRIANGLE;
-    } if (y > button_line->point_line_first.y && y < button_line->point_line_sec.y) {
-        figure = LINE;
-    } else if(y > button_circle->point_circle.y - (side_of_figure / 2) && y < button_circle->point_circle.y + (side_of_figure / 2)) {
-        figure = CIRCLE;
+    figure = RECTANGLE;
+  }
+  
+  if (y > button_triangle->sec_point.y && y < button_triangle->first_point.y) {
+    figure = TRIANGLE;
+  }
+
+  if (y > button_line->point_line_first.y && y < button_line->point_line_sec.y) {
+    figure = LINE;
+  } else if(y > button_circle->point_circle.y - (side_of_figure / 2) && y < button_circle->point_circle.y + (side_of_figure / 2)) {
+      figure = CIRCLE;
     }
 
   return figure;
