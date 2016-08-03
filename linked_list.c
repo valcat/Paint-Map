@@ -40,6 +40,16 @@ void addNode(Linked_list *linked_list, int x, int y)
   }
 }
 
+size_t count(Linked_list *linked_list) {
+  size_t count = 0;
+  Node_coordinates *indexNode = linked_list->head;
+  while (indexNode) {
+    count++;
+    indexNode = indexNode->next;
+  }
+  return count;
+}
+
 void freeNodes(Linked_list *linked_list)
 {
   free(linked_list);
