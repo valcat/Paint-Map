@@ -446,14 +446,15 @@ void drawLine(int x1, int y1, int x2, int y2)
 
 void clickForLine(int button, int state, int x, int y)
 { 
+  Node_coordinates* piece = NULL;
   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
     drawCircle(x, y, 5);
     addNode(linked_list, x, y);
     size_t number_of_nodes = count(linked_list);
 
     if (number_of_nodes > 1) {
-      printf("count - %zu\n", number_of_nodes);
-      //draw lines
+      piece = get_by_index(linked_list, number_of_nodes - 2);
+      drawLine(piece->x, piece->y, x, y);
     }
   }
 }
