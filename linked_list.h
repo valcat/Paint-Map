@@ -14,6 +14,7 @@ typedef struct Linked_list
 
 Linked_list* createLinkedList();
 void addNode(Linked_list *linked_list, int x, int y);
+size_t count(Linked_list *linked_list);
 void freeNodes(Linked_list *linked_list);
 
 #endif
