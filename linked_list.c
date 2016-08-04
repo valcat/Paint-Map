@@ -51,7 +51,7 @@ size_t count(Linked_list *linked_list)
   return count;
 }
 
-Node_coordinates* get_by_index(Linked_list *linked_list, int index)
+Node_coordinates* getByIndex(Linked_list *linked_list, int index)
 {
   size_t count = 0;
   Node_coordinates *indexNode = linked_list->head;
