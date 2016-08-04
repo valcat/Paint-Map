@@ -15,7 +15,7 @@ typedef struct Linked_list
 Linked_list* createLinkedList();
 void addNode(Linked_list *linked_list, int x, int y);
 size_t count(Linked_list *linked_list);
-Node_coordinates* get_by_index(Linked_list *linked_list, int index);
+Node_coordinates* getByIndex(Linked_list *linked_list, int index);
 void freeNodes(Linked_list *linked_list);
 
 #endif
