@@ -7,19 +7,39 @@
 #include <stdbool.h>
 #include <math.h>
 #include "linked_list.h"
+#include "circle.h"
+
 
 const int WIDTH_WINDOW = 1000;
 const int HEIGHT_WINDOW = 1000;
 const int PANEL_BORD_PADDING = 60;
 const char* WINDOW_NAME = "CAT-MAP";
-const int STEP = 20;
 const int MIN_HEIGHT_WINDOW = 700;
 const int side_of_figure = 20;
+const int STEP = 20;
 int flag = 0;
-int indicator = 0;
+
 int xf, yf, xs, ys;
 int width_indicator = 0;
 int height_indicator = 0;
+
+// TODO: check code style for the name
+typedef enum Drawing_state 
+{
+  DRAWING_TRIANGlE,
+  DRAWING_RECT,
+  ///....
+  DEFAULT_STATE
+} Drawing_state;
+
+typedef struct MapState
+{
+  int window_width;
+  int window_height;
+  Drawing_state drawing_state; // flag TODO: create enum for states
+} MapState;
+
+MapState mapState;
 
 /* initial coordinates of border */
 const int X_BORD = 0;
@@ -43,11 +63,6 @@ const int X_FST_L = 20;
 const int X_SND_L = 40;
 const int Y_FST_L = 510;
 const int Y_SND_L = 530;
-/* circle */
-const int X_CRL = 30;
-const int Y_CRL = 460;
-const int RADS = 10;
-const int NUM_SGMTS = 360;
 
 
 typedef enum Figure 
@@ -84,9 +99,9 @@ typedef struct Button
   Point point_line_first;
   Point point_line_sec;
   /* circle */
-  Point point_circle;
-  int radius;
-  int num_segments;
+  //Point point_circle;
+  //int radius;
+  //int num_segments;
 } Button;
 
 
@@ -96,7 +111,7 @@ Panel_border* border = NULL;
 Button* button_rect = NULL;
 Button* button_triangle = NULL;
 Button* button_line = NULL;
-Button* button_circle = NULL;
+Button_c* button_circle = NULL;
 Linked_list* linked_list = NULL;
 
 Panel_border* createPanelBorder(int x, int y, int width)
@@ -144,17 +159,6 @@ Button* createButtonLine(int x1, int y1, int x2, int y2)
   return button_line;
 }
 
-Button* createButtonCircle(int x, int y, int radius, int num_segments)
-{
-  Button* button_circle = malloc(sizeof(Button));
-  button_circle->point_circle.x = x;
-  button_circle->point_circle.y = y;
-  button_circle->radius = radius;
-  button_circle->num_segments = num_segments;
-
-  return button_circle;
-}
-
 void init(void)
 {
   border = createPanelBorder(X_BORD, Y_BORD, WIDTH_BORD);
@@ -162,12 +166,12 @@ void init(void)
   button_rect = createButtonRect(X_RECT, Y_RECT, WIDTH_RECT, HEIGHT_RECT);
   button_triangle = createButtonTriangle(X_FST_T, Y_FST_T, X_SND_T, Y_SCD_T, X_TRD_T, Y_TRD_T);
   button_line = createButtonLine(X_FST_L, Y_FST_L, X_SND_L, Y_SND_L);
-  button_circle = createButtonCircle(X_CRL, Y_CRL, RADS, NUM_SGMTS);
+  button_circle = initCircle();
   
   coordinates[0] = button_rect;
   coordinates[1] = button_triangle;
   coordinates[2] = button_line;
-  coordinates[3] = button_circle;
+  //coordinates[3] = button_circle;
   linked_list = createLinkedList();
 }
 
@@ -319,46 +323,7 @@ void drawLineButton(Button* button_line)
   glutSwapBuffers();
 } 
 
-void drawCircleButton(Button* button_circle)
-{
-  int i, cx, cy, num_segments, r, half_step;
-  double theta, c, s, x;
-  double t = 0.0;
-  double y = 0;
-  int dif = 2;
-  cx = button_circle->point_circle.x;
-  cy = button_circle->point_circle.y;
-  num_segments = button_circle->num_segments;
-  r = button_circle->radius;
 
-  theta = 2 * M_PI / num_segments;
-  c = cos(theta);
-  s = sin(theta);
-  x = r;
-  half_step = STEP / 2;
-
-  glColor3f(0.0, 0.4, 0.2);
-  glBegin(GL_POLYGON);
-  for (i = 0; i < num_segments; i++)
-  {
-    glVertex2f(x + cx, y + cy);
-    t = x;
-    x = c * x - s * y;
-    y = s * t + c * y;
-  } 
-  glEnd();
-
-  glColor3f(1.0, 1.0, 1.0);
-  glLineWidth(4.0);
-  glBegin(GL_LINE_LOOP);
-    glVertex2f(cx - half_step - dif, cy - half_step - dif);               
-    glVertex2f(cx + half_step + dif, cy - half_step - dif);         
-    glVertex2f(cx + half_step + dif, cy + half_step + dif);  
-    glVertex2f(cx - half_step - dif, cy + half_step + dif);
-  glEnd();
-  glFlush();
-  glutSwapBuffers();
-}
 
 void drawBitmapText(char *string, int x, int y) 
 {  
@@ -453,7 +418,7 @@ void clickForLine(int button, int state, int x, int y)
     size_t number_of_nodes = count(linked_list);
 
     if (number_of_nodes > 1) {
-      piece = get_by_index(linked_list, number_of_nodes - 2);
+      piece = getByIndex(linked_list, number_of_nodes - 2);
       drawLine(piece->x, piece->y, x, y);
     }
   }
