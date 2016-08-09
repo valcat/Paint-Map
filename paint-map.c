@@ -7,10 +7,11 @@
 #include <stdbool.h>
 #include <math.h>
 #include "linked_list.h"
+#include "allstructs.h"
 #include "circle.h"
 #include "rectangle.h"
-#include "allstructs.h"
-
+#include "line.h"
+#include "triangle.h"
 
 const int WIDTH_WINDOW = 1000;
 const int HEIGHT_WINDOW = 1000;
@@ -47,34 +48,16 @@ MapState mapState;
 const int X_BORD = 0;
 const int Y_BORD = 0;
 const int WIDTH_BORD = 60;
-/* initial coordinates of buttons: */
-/* triangle */
-const int X_FST_T = 30;
-const int X_SND_T = 20;
-const int X_TRD_T = 40;
-const int Y_FST_T = 590;
-const int Y_SCD_T = 570;
-const int Y_TRD_T = 570;
-/* line */
-const int X_FST_L = 20;
-const int X_SND_L = 40;
-const int Y_FST_L = 510;
-const int Y_SND_L = 530;
-
 
 typedef enum Figure 
 {
   RECTANGLE, TRIANGLE, LINE, CIRCLE
 } Figure;
 
-
 typedef struct Panel_border
 {
   Rectangle rect;
 } Panel_border;
-
-
-Button* coordinates[10];
 
 Panel_border* border = NULL;
 Button* button_rect = NULL;
@@ -93,43 +76,15 @@ Panel_border* createPanelBorder(int x, int y, int width)
   return border;
 }
 
-Button* createButtonTriangle(int x1, int y1, int x2, int y2, int x3,  int y3)
-{
-  Button* button_triangle = malloc(sizeof(Button));
-  button_triangle->first_point.x = x1;
-  button_triangle->first_point.y = y1;
-  button_triangle->sec_point.x = x2;
-  button_triangle->sec_point.y = y2;
-  button_triangle->third_point.x = x3;
-  button_triangle->third_point.y = y3;
-
-  return button_triangle;
-}
-
-Button* createButtonLine(int x1, int y1, int x2, int y2)
-{
-  Button* button_line = malloc(sizeof(Button));
-  button_line->point_line_first.x = x1;
-  button_line->point_line_first.y = y1;
-  button_line->point_line_sec.x = x2;
-  button_line->point_line_sec.y= y2;
-
-  return button_line;
-}
-
 void init(void)
 {
   border = createPanelBorder(X_BORD, Y_BORD, WIDTH_BORD);
 
   button_rect = initRect();
-  button_triangle = createButtonTriangle(X_FST_T, Y_FST_T, X_SND_T, Y_SCD_T, X_TRD_T, Y_TRD_T);
-  button_line = createButtonLine(X_FST_L, Y_FST_L, X_SND_L, Y_SND_L);
+  button_triangle = initTriangle();
+  button_line = initLine();
   button_circle = initCircle();
   
-  //coordinates[0] = button_rect;
-  coordinates[1] = button_triangle;
-  coordinates[2] = button_line;
-  //coordinates[3] = button_circle;
   linked_list = createLinkedList();
 }
 
@@ -197,62 +152,6 @@ void drawGrid()
   }
 }
 
-void drawTriangleButton(Button* button_triangle)
-{
-  int x1, x2, x3, y1, y2, y3;
-  x1 = button_triangle->first_point.x;
-  y1 = button_triangle->first_point.y;
-  x2 = button_triangle->sec_point.x;
-  y2 = button_triangle->sec_point.y;
-  x3 = button_triangle->third_point.x;
-  y3 = button_triangle->third_point.y;
-
-  glColor3f(1.0, 0.0, 0.3);
-  glBegin(GL_TRIANGLES);               
-    glVertex2f(x1, y1);        
-    glVertex2f(x2, y2);       
-    glVertex2f(x3, y3);    
-  glEnd();
-
-  glColor3f(1.0, 1.0, 1.0);
-  glLineWidth(4.0);
-  glBegin(GL_LINE_LOOP);
-    glVertex2f(x2, y2);               
-    glVertex2f(x3, y3);         
-    glVertex2f(x3, y3 + STEP);  
-    glVertex2f(x2, y2 + STEP);
-  glEnd();
-  glFlush();
-  glutSwapBuffers();
-}
-
-void drawLineButton(Button* button_line) 
-{
-  int x1, y1, x2, y2;
-  x1 = button_line->point_line_first.x;
-  y1 = button_line->point_line_first.y;
-  x2 = button_line->point_line_sec.x;
-  y2 = button_line->point_line_sec.y;
- 
-  glColor3f(0.0,0.4,0.2); 
-  glLineWidth(3.0); 
-  glBegin(GL_LINES);
-    glVertex2d(x1, y1);
-    glVertex2d(x2, y2);
-  glEnd();
-
-  glColor3f(1.0, 1.0, 1.0);
-  glLineWidth(4.0);
-  glBegin(GL_LINE_LOOP);
-    glVertex2f(x1, y1);               
-    glVertex2f(x1 + STEP, y1);         
-    glVertex2f(x2, y2);  
-    glVertex2f(x1, y1 + STEP);
-  glEnd();
-  glFlush();
-  glutSwapBuffers();
-} 
-
 void drawBitmapText(char *string, int x, int y) 
 {  
   char *c;
@@ -279,7 +178,6 @@ void draw(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
-
   /* draw working window and panel with set of tools */
   drawGrid();
   drawPanel(border);
