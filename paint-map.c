@@ -23,15 +23,14 @@ const int STEP = 20;
 int flag = 0;
 
 int xf, yf, xs, ys;
-int width_indicator = 0;
-int height_indicator = 0;
 
 // TODO: check code style for the name
 typedef enum Drawing_state 
 {
   DRAWING_TRIANGlE,
   DRAWING_RECT,
-  ///....
+  DRAWING_CIRCLE,
+  DRAWING_LINE,
   DEFAULT_STATE
 } Drawing_state;
 
@@ -79,7 +78,6 @@ Panel_border* createPanelBorder(int x, int y, int width)
 void init(void)
 {
   border = createPanelBorder(X_BORD, Y_BORD, WIDTH_BORD);
-
   button_rect = initRect();
   button_triangle = initTriangle();
   button_line = initLine();
@@ -93,7 +91,7 @@ void reshape(int width, int height)
   /* Minimum height is MIN_HEIGHT_WINDOW.
    * Window's size can not be smaller than this value. */
   if (height < MIN_HEIGHT_WINDOW) {
-    glutReshapeWindow(width_indicator, MIN_HEIGHT_WINDOW);
+    glutReshapeWindow(mapState.window_width, MIN_HEIGHT_WINDOW);
   }
   glViewport(0, 0, width, height);
   glMatrixMode(GL_PROJECTION);
@@ -101,8 +99,8 @@ void reshape(int width, int height)
   gluOrtho2D(0, width, 0, height);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
-  width_indicator = width;
-  height_indicator = height;
+  mapState.window_width = width;
+  mapState.window_height = height;
 }
 
 void drawPanel(Panel_border* border)
@@ -111,7 +109,7 @@ void drawPanel(Panel_border* border)
   x = border->rect.point.x;
   y = border->rect.point.y;
   width = border->rect.width;
-  height = height_indicator;
+  height = mapState.window_height;
 
   glColor3f(0.9, 0.9, 0.9);
   glBegin(GL_QUADS);              
@@ -131,22 +129,22 @@ void drawGrid()
   int x, y;
 
   /* vertical lines */
-  for (x = 0; x < width_indicator; x += STEP) {
+  for (x = 0; x < mapState.window_width; x += STEP) {
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1);
     glBegin(GL_LINES);
       glVertex2d(x, 0);
-      glVertex2d(x, height_indicator);
+      glVertex2d(x, mapState.window_height);
     glEnd();
     glFlush();
   }
   /* horizontal lines */
-  for (y = 0; y < height_indicator; y += STEP) {
+  for (y = 0; y < mapState.window_height; y += STEP) {
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(1);
     glBegin(GL_LINES);
       glVertex2d(0, y);
-      glVertex2d(width_indicator, y);
+      glVertex2d(mapState.window_width, y);
     glEnd();
     glFlush();
   }
@@ -187,54 +185,6 @@ void draw(void)
   glFlush();
 }
 
-void drawRectangle(int x, int y) 
-{
-  int width = 20;
-  int height = 20;
-
-  glColor3f(0.0, 1.0, 0.0);
-  glBegin(GL_QUADS);              
-    glVertex2f(x, y);               
-    glVertex2f(x + width, y);         
-    glVertex2f(x + width, y + height);  
-    glVertex2f(x, y + height);
-  glEnd();
-  glFlush();
-  glutSwapBuffers();
-}
-
-void drawCircle(int x, int y, int radius)
-{
-  int i;
-  int triangleAmount = 20;
-  double twicePi = 2 * M_PI;
-
-  glColor3f(0.0, 0.4, 0.2);
-  glBegin(GL_TRIANGLE_FAN);
-    /* center of circle */
-    glVertex2f(x, y); 
-    for (i = 0; i <= triangleAmount; i++) { 
-      glVertex2f(
-      x + (radius * cos(i * twicePi / triangleAmount)), 
-      y + (radius * sin(i * twicePi / triangleAmount)));
-    }
-  glEnd();
-  glFlush();
-  glutSwapBuffers();
-}
-
-void drawLine(int x1, int y1, int x2, int y2) 
-{
-  glColor3f(0.0,0.4,0.2); 
-  glPointSize(3.0);  
-  glBegin(GL_LINES);
-    glVertex2d(x1, y1);
-    glVertex2d(x2, y2);
-  glEnd();
-  glFlush();
-  glutSwapBuffers();
-}
-
 void clickForLine(int button, int state, int x, int y)
 { 
   Node_coordinates* piece = NULL;
@@ -256,17 +206,14 @@ Figure checkCollision(int x, int y)
   Figure figure;
   if (y > button_rect->rect.point.y && y < (button_rect->rect.point.y + side_of_figure)) {
     figure = RECTANGLE;
-  }
-  
-  if (y > button_triangle->sec_point.y && y < button_triangle->first_point.y) {
+  } else if (y > button_triangle->sec_point.y && y < button_triangle->first_point.y) {
     figure = TRIANGLE;
-  }
-
-  if (y > button_line->point_line_first.y && y < button_line->point_line_sec.y) {
+  } else if (y > button_line->point_line_first.y && y < button_line->point_line_sec.y) {
     figure = LINE;
-  } else if(y > button_circle->point_circle.y - (side_of_figure / 2) && y < button_circle->point_circle.y + (side_of_figure / 2)) {
+  } else if(y > button_circle->point_circle.y - (side_of_figure / 2) 
+    && y < button_circle->point_circle.y + (side_of_figure / 2)) {
       figure = CIRCLE;
-    }
+  }
 
   return figure;
 }
@@ -281,31 +228,31 @@ void initFlag(int x, int y)
     figure = checkCollision(x, y);   
   } 
   if (figure == RECTANGLE) {
-    flag = 1;
+    mapState.drawing_state = DRAWING_RECT;
   } else if (figure == TRIANGLE) {
-    flag = 2;
+    mapState.drawing_state = DRAWING_TRIANGlE;
   } else if (figure == LINE) {
-    flag = 3;
+    mapState.drawing_state = DRAWING_LINE;
   } else if (figure == CIRCLE) {
-    flag = 4;
+    mapState.drawing_state = DRAWING_CIRCLE;
   }
 }
 
 /* draw figure what was chosen from the buttons */
 void mouse(int button, int state, int x, int y)
 {
-  int new_y = height_indicator - y;
+  int new_y = mapState.window_height - y;
   int a;
   a = (x > 60);
   printf(" XX - %d\n", x);
   printf("YY - %d\n", new_y);
   initFlag(x, new_y); 
 
-  if (flag == 1 && a) {
+  if (mapState.drawing_state == DRAWING_RECT && a) {
     drawRectangle(x, new_y);
-  } else if (flag == 4 && a) {
+  } else if (mapState.drawing_state == DRAWING_CIRCLE && a) {
     drawCircle(x, new_y, 10);
-  } else if (flag == 3 && a) {
+  } else if (mapState.drawing_state == DRAWING_LINE && a) {
     clickForLine(button, state, x, new_y);
   }
 }
