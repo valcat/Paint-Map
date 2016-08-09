@@ -8,6 +8,8 @@
 #include <math.h>
 #include "linked_list.h"
 #include "circle.h"
+#include "rectangle.h"
+#include "allstructs.h"
 
 
 const int WIDTH_WINDOW = 1000;
@@ -46,11 +48,6 @@ const int X_BORD = 0;
 const int Y_BORD = 0;
 const int WIDTH_BORD = 60;
 /* initial coordinates of buttons: */
-/* rectangle */
-const int X_RECT = 20;
-const int Y_RECT = 630;
-const int WIDTH_RECT = 20;
-const int HEIGHT_RECT = 20;
 /* triangle */
 const int X_FST_T = 30;
 const int X_SND_T = 20;
@@ -70,39 +67,11 @@ typedef enum Figure
   RECTANGLE, TRIANGLE, LINE, CIRCLE
 } Figure;
 
-typedef struct Point
-{
-  int x;
-  int y;
-} Point;
-
-typedef struct Rectangle
-{
-  Point point;
-  int width;
-  int height;
-} Rectangle;
 
 typedef struct Panel_border
 {
   Rectangle rect;
 } Panel_border;
-
-typedef struct Button
-{
-  Rectangle rect;
-  /* triangle */
-  Point first_point;
-  Point sec_point;
-  Point third_point;
-  /* line */
-  Point point_line_first;
-  Point point_line_sec;
-  /* circle */
-  //Point point_circle;
-  //int radius;
-  //int num_segments;
-} Button;
 
 
 Button* coordinates[10];
@@ -111,7 +80,7 @@ Panel_border* border = NULL;
 Button* button_rect = NULL;
 Button* button_triangle = NULL;
 Button* button_line = NULL;
-Button_c* button_circle = NULL;
+Button* button_circle = NULL;
 Linked_list* linked_list = NULL;
 
 Panel_border* createPanelBorder(int x, int y, int width)
@@ -122,17 +91,6 @@ Panel_border* createPanelBorder(int x, int y, int width)
   border->rect.width = width;
 
   return border;
-}
-
-Button* createButtonRect(int x, int y, int width, int height)
-{
-  Button* button_rect = malloc(sizeof(Button));
-  button_rect->rect.point.x = x;
-  button_rect->rect.point.y = y;
-  button_rect->rect.width = width;
-  button_rect->rect.height = height;
-
-  return button_rect;
 }
 
 Button* createButtonTriangle(int x1, int y1, int x2, int y2, int x3,  int y3)
@@ -163,12 +121,12 @@ void init(void)
 {
   border = createPanelBorder(X_BORD, Y_BORD, WIDTH_BORD);
 
-  button_rect = createButtonRect(X_RECT, Y_RECT, WIDTH_RECT, HEIGHT_RECT);
+  button_rect = initRect();
   button_triangle = createButtonTriangle(X_FST_T, Y_FST_T, X_SND_T, Y_SCD_T, X_TRD_T, Y_TRD_T);
   button_line = createButtonLine(X_FST_L, Y_FST_L, X_SND_L, Y_SND_L);
   button_circle = initCircle();
   
-  coordinates[0] = button_rect;
+  //coordinates[0] = button_rect;
   coordinates[1] = button_triangle;
   coordinates[2] = button_line;
   //coordinates[3] = button_circle;
@@ -239,34 +197,6 @@ void drawGrid()
   }
 }
 
-void drawRectangleButton(Button *button_rect) 
-{
-  int x, y, width, height;
-  x = button_rect->rect.point.x;
-  y = button_rect->rect.point.y;
-  width = button_rect->rect.width;
-  height = button_rect->rect.height;
- 
-  glBegin(GL_QUADS); 
-    glColor3f(0.0, 1.0, 0.0);           
-    glVertex2f(x, y);               
-    glVertex2f(x + width, y);         
-    glVertex2f(x + width, y + height);  
-    glVertex2f(x, y + height);
-  glEnd();
-
-  glColor3f(1.0, 1.0, 1.0);
-  glLineWidth(4.0);
-  glBegin(GL_LINE_LOOP);
-    glVertex2f(x, y);               
-    glVertex2f(x + width, y);         
-    glVertex2f(x + width, y + height);  
-    glVertex2f(x, y + height);
-  glEnd();
-  glFlush();
-  glutSwapBuffers();
-}
-
 void drawTriangleButton(Button* button_triangle)
 {
   int x1, x2, x3, y1, y2, y3;
@@ -322,8 +252,6 @@ void drawLineButton(Button* button_line)
   glFlush();
   glutSwapBuffers();
 } 
-
-
 
 void drawBitmapText(char *string, int x, int y) 
 {  
@@ -425,7 +353,7 @@ void clickForLine(int button, int state, int x, int y)
 }
 
 /* check what button was pressed */
-Figure checkButton(int x, int y)
+Figure checkCollision(int x, int y)
 {
   Figure figure;
   if (y > button_rect->rect.point.y && y < (button_rect->rect.point.y + side_of_figure)) {
@@ -452,7 +380,7 @@ void initFlag(int x, int y)
   Figure figure;
 
   if (x > beginig_x && x < end_x) {
-    figure = checkButton(x, y);   
+    figure = checkCollision(x, y);   
   } 
   if (figure == RECTANGLE) {
     flag = 1;
