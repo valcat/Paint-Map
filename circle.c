@@ -8,6 +8,7 @@
 #include <math.h>
 #include "linked_list.h"
 #include "circle.h"
+#include "allstructs.h"
 
 /* circle */
 const int X_CRL = 30;
@@ -71,6 +72,26 @@ void drawCircleButton(Button* button_circle)
     glVertex2f(cx + half_step + dif, cy - half_step - dif);         
     glVertex2f(cx + half_step + dif, cy + half_step + dif);  
     glVertex2f(cx - half_step - dif, cy + half_step + dif);
+  glEnd();
+  glFlush();
+  glutSwapBuffers();
+}
+
+void drawCircle(int x, int y, int radius)
+{
+  int i;
+  int triangleAmount = 20;
+  double twicePi = 2 * M_PI;
+
+  glColor3f(0.0, 0.4, 0.2);
+  glBegin(GL_TRIANGLE_FAN);
+    /* center of circle */
+    glVertex2f(x, y); 
+    for (i = 0; i <= triangleAmount; i++) { 
+      glVertex2f(
+      x + (radius * cos(i * twicePi / triangleAmount)), 
+      y + (radius * sin(i * twicePi / triangleAmount)));
+    }
   glEnd();
   glFlush();
   glutSwapBuffers();
