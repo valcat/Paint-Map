@@ -17,9 +17,9 @@ const int NUM_SGMTS = 360;
 const int SEGMENT = 20;
 
 
-Button_c* createButtonCircle(int x, int y, int radius, int num_segments)
+Button* createButtonCircle(int x, int y, int radius, int num_segments)
 {
-  Button_c* button_circle = malloc(sizeof(Button_c));
+  Button* button_circle = malloc(sizeof(Button));
   button_circle->point_circle.x = x;
   button_circle->point_circle.y = y;
   button_circle->radius = radius;
@@ -28,14 +28,14 @@ Button_c* createButtonCircle(int x, int y, int radius, int num_segments)
   return button_circle;
 }
 
-Button_c* initCircle()
+Button* initCircle()
 {
-	Button_c* button_circle = NULL;
+	Button* button_circle = NULL;
 	button_circle = createButtonCircle(X_CRL, Y_CRL, RADS, NUM_SGMTS);
 	return button_circle;
 }
 
-void drawCircleButton(Button_c* button_circle)
+void drawCircleButton(Button* button_circle)
 {
   int i, cx, cy, num_segments, r, half_step;
   double theta, c, s, x;
