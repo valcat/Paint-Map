@@ -1,21 +1,21 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
-typedef struct Node_coordinates
+typedef struct Node
 {
-  int x, y;
-  struct Node_coordinates *next;
-} Node_coordinates;
+  void* element;
+  struct Node* next;
+} Node;
 
 typedef struct Linked_list
 {
-  Node_coordinates *head;
+  Node* head;
 } Linked_list;
 
 Linked_list* createLinkedList();
-void addNode(Linked_list *linked_list, int x, int y);
+void addNode(Linked_list* linked_list, void* x);
 size_t count(Linked_list *linked_list);
-Node_coordinates* getByIndex(Linked_list *linked_list, int index);
+Node* getByIndex(Linked_list *linked_list, int index);
 void freeNodes(Linked_list *linked_list);
 
 #endif
