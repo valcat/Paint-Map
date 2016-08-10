@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include "linked_list.h"
+#include "allstructs.h"
 
 Linked_list* createLinkedList() 
 {
@@ -15,26 +16,24 @@ Linked_list* createLinkedList()
   return list;
 }
 
-void addNode(Linked_list *linked_list, int x, int y)
+void addNode(Linked_list *linked_list, void* x)
 {
-  Node_coordinates *piece = NULL;
+  Node *piece = NULL;
 
   if (linked_list->head) {
-    Node_coordinates *IndexNode = linked_list->head;
+    Node *IndexNode = linked_list->head;
 
     while (IndexNode->next) {
       IndexNode = IndexNode->next;
     }
-    piece = malloc(sizeof(Node_coordinates));
-    piece->x = x; 
-    piece->y = y;
+    piece = malloc(sizeof(Node));
+    piece->element = x; 
     piece->next = NULL;
     IndexNode->next = piece;
 
   } else {
-    piece = malloc(sizeof(Node_coordinates));
-    piece->x = x;
-    piece->y = y;
+    piece = malloc(sizeof(Node));
+    piece->element = x;
     piece->next = NULL;
     linked_list->head = piece;
   }
@@ -43,7 +42,7 @@ void addNode(Linked_list *linked_list, int x, int y)
 size_t count(Linked_list *linked_list) 
 {
   size_t count = 0;
-  Node_coordinates *indexNode = linked_list->head;
+  Node *indexNode = linked_list->head;
   while (indexNode) {
     count++;
     indexNode = indexNode->next;
@@ -51,10 +50,10 @@ size_t count(Linked_list *linked_list)
   return count;
 }
 
-Node_coordinates* getByIndex(Linked_list *linked_list, int index)
+Node* getByIndex(Linked_list *linked_list, int index)
 {
   size_t count = 0;
-  Node_coordinates *indexNode = linked_list->head;
+  Node *indexNode = linked_list->head;
   while (indexNode) {
     if (count == index) {
       return indexNode;
