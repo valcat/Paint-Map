@@ -63,7 +63,9 @@ Button* button_rect = NULL;
 Button* button_triangle = NULL;
 Button* button_line = NULL;
 Button* button_circle = NULL;
-Linked_list* linked_list = NULL;
+Linked_list* points_storage = NULL;
+Node* piece = NULL;
+Point* point = NULL;
 
 Panel_border* createPanelBorder(int x, int y, int width)
 {
@@ -83,7 +85,7 @@ void init(void)
   button_line = initLine();
   button_circle = initCircle();
   
-  linked_list = createLinkedList();
+  points_storage = createLinkedList();
 }
 
 void reshape(int width, int height)
@@ -185,17 +187,20 @@ void draw(void)
   glFlush();
 }
 
-void clickForLine(int button, int state, int x, int y)
+void clickOnLine(int button, int state, int x, int y)
 { 
-  Node_coordinates* piece = NULL;
   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    point = malloc(sizeof(Point));
     drawCircle(x, y, 5);
-    addNode(linked_list, x, y);
-    size_t number_of_nodes = count(linked_list);
+    point->x = x;
+    point->y = y;
+    addNode(points_storage, point);
+    size_t number_of_nodes = count(points_storage);
 
     if (number_of_nodes > 1) {
-      piece = getByIndex(linked_list, number_of_nodes - 2);
-      drawLine(piece->x, piece->y, x, y);
+      piece = getByIndex(points_storage, number_of_nodes - 2);
+      Point* indexPoint = (Point*)(piece->element);
+      drawLine(indexPoint->x, indexPoint->y, x, y);
     }
   }
 }
@@ -244,16 +249,16 @@ void mouse(int button, int state, int x, int y)
   int new_y = mapState.window_height - y;
   int a;
   a = (x > 60);
-  printf(" XX - %d\n", x);
-  printf("YY - %d\n", new_y);
-  initFlag(x, new_y); 
+  initFlag(x, new_y);
+  printf("Y -- %d\n", new_y); 
+  printf("X -- %d\n", x);
 
   if (mapState.drawing_state == DRAWING_RECT && a) {
     drawRectangle(x, new_y);
   } else if (mapState.drawing_state == DRAWING_CIRCLE && a) {
     drawCircle(x, new_y, 10);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
-    clickForLine(button, state, x, new_y);
+    clickOnLine(button, state, x, new_y);
   }
 }
 
@@ -274,8 +279,9 @@ int main(int argc, char *argv[])
   free(button_rect);
   free(button_triangle);
   free(button_line);
-  freeNodes(linked_list);
-  free(linked_list);
+  freeNodes(points_storage);
+  free(points_storage);
+  free(point);
 
   return 0;
 }
