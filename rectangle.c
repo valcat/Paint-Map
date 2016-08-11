@@ -15,22 +15,23 @@ const int Y_RECT = 630;
 const int WIDTH_RECT = 20;
 const int HEIGHT_RECT = 20;
 
+MapState stateRect;
+
 Button* createButtonRect(int x, int y, int width, int height)
 {
-  Button* button_rect = malloc(sizeof(Button));
-  button_rect->rect.point.x = x;
-  button_rect->rect.point.y = y;
-  button_rect->rect.width = width;
-  button_rect->rect.height = height;
+  stateRect.button_rect = malloc(sizeof(Button));
+  stateRect.button_rect->rect.point.x = x;
+  stateRect.button_rect->rect.point.y = y;
+  stateRect.button_rect->rect.width = width;
+  stateRect.button_rect->rect.height = height;
 
-  return button_rect;
+  return stateRect.button_rect;
 }
 
 Button* initRect()
 {
-	Button* button_rect = NULL;
-	button_rect = createButtonRect(X_RECT, Y_RECT, WIDTH_RECT, HEIGHT_RECT);
-	return button_rect;
+	stateRect.button_rect = createButtonRect(X_RECT, Y_RECT, WIDTH_RECT, HEIGHT_RECT);
+	return stateRect.button_rect;
 }
 
 void drawRectangleButton(Button* button_rect) 
