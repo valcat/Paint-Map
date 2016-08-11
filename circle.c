@@ -17,23 +17,23 @@ const int RADS = 10;
 const int NUM_SGMTS = 360;
 const int SEGMENT = 20;
 
+MapState stateCircle;
 
 Button* createButtonCircle(int x, int y, int radius, int num_segments)
 {
-  Button* button_circle = malloc(sizeof(Button));
-  button_circle->point_circle.x = x;
-  button_circle->point_circle.y = y;
-  button_circle->radius = radius;
-  button_circle->num_segments = num_segments;
+  stateCircle.button_circle = malloc(sizeof(Button));
+  stateCircle.button_circle->point_circle.x = x;
+  stateCircle.button_circle->point_circle.y = y;
+  stateCircle.button_circle->radius = radius;
+  stateCircle.button_circle->num_segments = num_segments;
 
-  return button_circle;
+  return stateCircle.button_circle;
 }
 
 Button* initCircle()
 {
-	Button* button_circle = NULL;
-	button_circle = createButtonCircle(X_CRL, Y_CRL, RADS, NUM_SGMTS);
-	return button_circle;
+	stateCircle.button_circle = createButtonCircle(X_CRL, Y_CRL, RADS, NUM_SGMTS);
+	return stateCircle.button_circle;
 }
 
 void drawCircleButton(Button* button_circle)
