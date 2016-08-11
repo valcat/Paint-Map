@@ -62,8 +62,3 @@ Node* getByIndex(Linked_list *linked_list, int index)
     count++;
   }
 }
-
-void freeNodes(Linked_list *linked_list)
-{
-  free(linked_list);
-}
