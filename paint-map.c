@@ -20,72 +20,33 @@ const char* WINDOW_NAME = "CAT-MAP";
 const int MIN_HEIGHT_WINDOW = 700;
 const int side_of_figure = 20;
 const int STEP = 20;
-int flag = 0;
-
-int xf, yf, xs, ys;
-
-// TODO: check code style for the name
-typedef enum Drawing_state 
-{
-  DRAWING_TRIANGlE,
-  DRAWING_RECT,
-  DRAWING_CIRCLE,
-  DRAWING_LINE,
-  DEFAULT_STATE
-} Drawing_state;
-
-typedef struct MapState
-{
-  int window_width;
-  int window_height;
-  Drawing_state drawing_state; // flag TODO: create enum for states
-} MapState;
-
-MapState mapState;
-
 /* initial coordinates of border */
 const int X_BORD = 0;
 const int Y_BORD = 0;
 const int WIDTH_BORD = 60;
 
-typedef enum Figure 
-{
-  RECTANGLE, TRIANGLE, LINE, CIRCLE
-} Figure;
+MapState mapState;
 
-typedef struct Panel_border
-{
-  Rectangle rect;
-} Panel_border;
-
-Panel_border* border = NULL;
-Button* button_rect = NULL;
-Button* button_triangle = NULL;
-Button* button_line = NULL;
-Button* button_circle = NULL;
-Linked_list* points_storage = NULL;
-Node* piece = NULL;
-Point* point = NULL;
 
 Panel_border* createPanelBorder(int x, int y, int width)
 {
-  Panel_border* border = malloc(sizeof(Panel_border));
-  border->rect.point.x = x;
-  border->rect.point.y = y;
-  border->rect.width = width;
+  mapState.border = malloc(sizeof(Panel_border));
+  mapState.border->rect.point.x = x;
+  mapState.border->rect.point.y = y;
+  mapState.border->rect.width = width;
 
-  return border;
+  return mapState.border;
 }
 
 void init(void)
 {
-  border = createPanelBorder(X_BORD, Y_BORD, WIDTH_BORD);
-  button_rect = initRect();
-  button_triangle = initTriangle();
-  button_line = initLine();
-  button_circle = initCircle();
+  mapState.border = createPanelBorder(X_BORD, Y_BORD, WIDTH_BORD);
+  mapState.button_rect = initRect();
+  mapState.button_triangle = initTriangle();
+  mapState.button_line = initLine();
+  mapState.button_circle = initCircle();
   
-  points_storage = createLinkedList();
+  mapState.points_storage = createLinkedList();
 }
 
 void reshape(int width, int height)
@@ -122,8 +83,6 @@ void drawPanel(Panel_border* border)
   glEnd();
   glFlush();
   glutSwapBuffers();
-  printf(" y2 - %d\n", y);
-  printf("height - %d\n", height);
 }
 
 void drawGrid()
@@ -167,10 +126,10 @@ void drawBitmapText(char *string, int x, int y)
 
 void drawButtons(void)
 {
-  drawRectangleButton(button_rect);
-  drawTriangleButton(button_triangle);
-  drawLineButton(button_line);
-  drawCircleButton(button_circle);
+  drawRectangleButton(mapState.button_rect);
+  drawTriangleButton(mapState.button_triangle);
+  drawLineButton(mapState.button_line);
+  drawCircleButton(mapState.button_circle);
 }
 
 /* function that draws window with all stuff */
@@ -180,7 +139,7 @@ void draw(void)
   glLoadIdentity();
   /* draw working window and panel with set of tools */
   drawGrid();
-  drawPanel(border);
+  drawPanel(mapState.border);
   glColor3f(0, 0, 0);
   drawBitmapText("Tools", 2, 680);
   drawButtons();
@@ -190,16 +149,16 @@ void draw(void)
 void clickOnLine(int button, int state, int x, int y)
 { 
   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-    point = malloc(sizeof(Point));
+    mapState.point = malloc(sizeof(Point));
     drawCircle(x, y, 5);
-    point->x = x;
-    point->y = y;
-    addNode(points_storage, point);
-    size_t number_of_nodes = count(points_storage);
+    mapState.point->x = x;
+    mapState.point->y = y;
+    addNode(mapState.points_storage, mapState.point);
+    size_t number_of_nodes = count(mapState.points_storage);
 
     if (number_of_nodes > 1) {
-      piece = getByIndex(points_storage, number_of_nodes - 2);
-      Point* indexPoint = (Point*)(piece->element);
+      mapState.piece = getByIndex(mapState.points_storage, number_of_nodes - 2);
+      Point* indexPoint = (Point*)(mapState.piece->element);
       drawLine(indexPoint->x, indexPoint->y, x, y);
     }
   }
@@ -209,14 +168,14 @@ void clickOnLine(int button, int state, int x, int y)
 Figure checkCollision(int x, int y)
 {
   Figure figure;
-  if (y > button_rect->rect.point.y && y < (button_rect->rect.point.y + side_of_figure)) {
+  if (y > mapState.button_rect->rect.point.y && y < (mapState.button_rect->rect.point.y + side_of_figure)) {
     figure = RECTANGLE;
-  } else if (y > button_triangle->sec_point.y && y < button_triangle->first_point.y) {
+  } else if (y > mapState.button_triangle->sec_point.y && y < mapState.button_triangle->first_point.y) {
     figure = TRIANGLE;
-  } else if (y > button_line->point_line_first.y && y < button_line->point_line_sec.y) {
+  } else if (y > mapState.button_line->point_line_first.y && y < mapState.button_line->point_line_sec.y) {
     figure = LINE;
-  } else if(y > button_circle->point_circle.y - (side_of_figure / 2) 
-    && y < button_circle->point_circle.y + (side_of_figure / 2)) {
+  } else if(y > mapState.button_circle->point_circle.y - (side_of_figure / 2) 
+    && y < mapState.button_circle->point_circle.y + (side_of_figure / 2)) {
       figure = CIRCLE;
   }
 
@@ -275,13 +234,13 @@ int main(int argc, char *argv[])
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glutMouseFunc(mouse);
   glutMainLoop();
-  free(border);
-  free(button_rect);
-  free(button_triangle);
-  free(button_line);
-  freeNodes(points_storage);
-  free(points_storage);
-  free(point);
+  free(mapState.border);
+  free(mapState.button_rect);
+  free(mapState.button_triangle);
+  free(mapState.button_line);
+  free(mapState.button_circle);
+  free(mapState.points_storage);
+  free(mapState.point);
 
   return 0;
 }
