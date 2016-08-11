@@ -17,23 +17,24 @@ const int Y_FST_L = 510;
 const int Y_SND_L = 530;
 const int STEP_L = 20;
 
+MapState stateLine;
+
 
 Button* createButtonLine(int x1, int y1, int x2, int y2)
 {
-  Button* button_line = malloc(sizeof(Button));
-  button_line->point_line_first.x = x1;
-  button_line->point_line_first.y = y1;
-  button_line->point_line_sec.x = x2;
-  button_line->point_line_sec.y= y2;
+  stateLine.button_line = malloc(sizeof(Button));
+  stateLine.button_line->point_line_first.x = x1;
+  stateLine.button_line->point_line_first.y = y1;
+  stateLine.button_line->point_line_sec.x = x2;
+  stateLine.button_line->point_line_sec.y= y2;
 
-  return button_line;
+  return stateLine.button_line;
 }
 
 Button* initLine()
 {
-	Button* button_line = NULL;
-	button_line = createButtonLine(X_FST_L, Y_FST_L, X_SND_L, Y_SND_L);
-	return button_line;
+	stateLine.button_line = createButtonLine(X_FST_L, Y_FST_L, X_SND_L, Y_SND_L);
+	return stateLine.button_line;
 }
 
 void drawLineButton(Button* button_line) 
