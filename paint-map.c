@@ -132,6 +132,39 @@ void drawButtons(void)
   drawCircleButton(mapState.button_circle);
 }
 
+void savePoints(int button, int state, int x, int y)
+{ 
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    mapState.point = malloc(sizeof(Point));
+    mapState.point->x = x;
+    mapState.point->y = y;
+    addNode(mapState.points_storage, mapState.point);
+    printf("x from storage -- -- %d\n", mapState.point->x);
+  }
+}
+
+void drawLine(void)
+{
+  size_t number_of_nodes = count(mapState.points_storage);
+  size_t count = 0;
+  Node* indexNode = mapState.points_storage->head;
+  
+  //printf("count of nodes -- %zu\n", number_of_nodes);
+  if (number_of_nodes > 1) {
+    printf("COUNT ___ %zu\n", count);
+
+    while (indexNode) {     
+      Point* point1 = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 2);
+      Point* point2 = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1);
+      drawingLine(point1->x, point1->y, point2->x, point2->y);
+      count++;  
+      indexNode = indexNode->next;  
+      
+    }
+  }
+    
+}
+
 /* function that draws window with all stuff */
 void draw(void)
 {
@@ -143,26 +176,10 @@ void draw(void)
   glColor3f(0, 0, 0);
   drawBitmapText("Tools", 2, 680);
   drawButtons();
+  drawLine();
   glFlush();
 }
 
-void clickOnLine(int button, int state, int x, int y)
-{ 
-  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-    mapState.point = malloc(sizeof(Point));
-    drawCircle(x, y, 5);
-    mapState.point->x = x;
-    mapState.point->y = y;
-    addNode(mapState.points_storage, mapState.point);
-    size_t number_of_nodes = count(mapState.points_storage);
-
-    if (number_of_nodes > 1) {
-      mapState.piece = getByIndex(mapState.points_storage, number_of_nodes - 2);
-      Point* indexPoint = (Point*)(mapState.piece->element);
-      drawLine(indexPoint->x, indexPoint->y, x, y);
-    }
-  }
-}
 
 /* check what button was pressed */
 Figure checkCollision(int x, int y)
@@ -217,7 +234,7 @@ void mouse(int button, int state, int x, int y)
   } else if (mapState.drawing_state == DRAWING_CIRCLE && a) {
     drawCircle(x, new_y, 10);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
-    clickOnLine(button, state, x, new_y);
+    savePoints(button, state, x, new_y);
   }
 }
 
