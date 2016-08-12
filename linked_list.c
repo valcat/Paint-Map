@@ -50,13 +50,13 @@ size_t count(Linked_list *linked_list)
   return count;
 }
 
-Node* getByIndex(Linked_list *linked_list, int index)
+void* getByIndex(Linked_list *linked_list, int index)
 {
   size_t count = 0;
-  Node *indexNode = linked_list->head;
+  Node* indexNode = linked_list->head;
   while (indexNode) {
     if (count == index) {
-      return indexNode;
+      return indexNode->element;
     }
     indexNode = indexNode->next;
     count++;
