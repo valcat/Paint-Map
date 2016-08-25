@@ -139,7 +139,7 @@ void savePoints(int button, int state, int x, int y)
     mapState.point->x = x;
     mapState.point->y = y;
     addNode(mapState.points_storage, mapState.point);
-    printf("x from storage -- -- %d\n", mapState.point->x);
+    printf("x from storage- %d\n", mapState.point->x);
   }
 }
 
@@ -148,21 +148,22 @@ void drawLine(void)
   size_t number_of_nodes = count(mapState.points_storage);
   size_t count = 0;
   Node* indexNode = mapState.points_storage->head;
-  
-  //printf("count of nodes -- %zu\n", number_of_nodes);
-  if (number_of_nodes > 1) {
-    printf("COUNT ___ %zu\n", count);
+  Point* point1;
+  Point* point2;
 
-    while (indexNode) {     
-      Point* point1 = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 2);
-      Point* point2 = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1);
-      drawingLine(point1->x, point1->y, point2->x, point2->y);
-      count++;  
-      indexNode = indexNode->next;  
+  if (number_of_nodes > 1) {
+    while (indexNode) {   
+      point1 = indexNode->element;
       
+      if (count < number_of_nodes - 1) {
+        point2 = indexNode->next->element;
+      }
+      drawingLine(point1->x, point1->y, point2->x, point2->y);
+      drawCircle(point1->x, point1->y, 5);
+      count++;  
+      indexNode = indexNode->next; 
     }
-  }
-    
+  }   
 }
 
 /* function that draws window with all stuff */
