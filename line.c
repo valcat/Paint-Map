@@ -60,11 +60,9 @@ void drawLineButton(Button* button_line)
     glVertex2f(x2, y2);  
     glVertex2f(x1, y1 + STEP_L);
   glEnd();
-  glFlush();
-  glutSwapBuffers();
 } 
 
-void drawLine(int x1, int y1, int x2, int y2) 
+void drawingLine(int x1, int y1, int x2, int y2) 
 {
   glColor3f(0.0,0.4,0.2); 
   glPointSize(3.0);  
@@ -72,6 +70,4 @@ void drawLine(int x1, int y1, int x2, int y2)
     glVertex2d(x1, y1);
     glVertex2d(x2, y2);
   glEnd();
-  glFlush();
-  glutSwapBuffers();
 }
