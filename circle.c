@@ -73,8 +73,6 @@ void drawCircleButton(Button* button_circle)
     glVertex2f(cx + half_step + dif, cy + half_step + dif);  
     glVertex2f(cx - half_step - dif, cy + half_step + dif);
   glEnd();
-  glFlush();
-  glutSwapBuffers();
 }
 
 void drawCircle(int x, int y, int radius)
@@ -93,7 +91,5 @@ void drawCircle(int x, int y, int radius)
       y + (radius * sin(i * twicePi / triangleAmount)));
     }
   glEnd();
-  glFlush();
-  glutSwapBuffers();
 }
 
