@@ -65,6 +65,4 @@ void drawTriangleButton(Button* button_triangle)
     glVertex2f(x3, y3 + STEP_T);  
     glVertex2f(x2, y2 + STEP_T);
   glEnd();
-  glFlush();
-  glutSwapBuffers();
 }
