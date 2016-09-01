@@ -58,8 +58,6 @@ void drawRectangleButton(Button* button_rect)
     glVertex2f(x + width, y + height);  
     glVertex2f(x, y + height);
   glEnd();
-  glFlush();
-  glutSwapBuffers();
 }
 
 void drawRectangle(int x, int y) 
@@ -74,6 +72,4 @@ void drawRectangle(int x, int y)
     glVertex2f(x + width, y + height);  
     glVertex2f(x, y + height);
   glEnd();
-  glFlush();
-  glutSwapBuffers();
 }
