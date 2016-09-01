@@ -26,6 +26,7 @@ const int Y_BORD = 0;
 const int WIDTH_BORD = 60;
 
 MapState mapState;
+void draw(void);
 
 
 Panel_border* createPanelBorder(int x, int y, int width)
@@ -81,8 +82,6 @@ void drawPanel(Panel_border* border)
     glVertex2f(x + width, height);  
     glVertex2f(x, height);
   glEnd();
-  glFlush();
-  glutSwapBuffers();
 }
 
 void drawGrid()
@@ -97,7 +96,6 @@ void drawGrid()
       glVertex2d(x, 0);
       glVertex2d(x, mapState.window_height);
     glEnd();
-    glFlush();
   }
   /* horizontal lines */
   for (y = 0; y < mapState.window_height; y += STEP) {
@@ -107,7 +105,6 @@ void drawGrid()
       glVertex2d(0, y);
       glVertex2d(mapState.window_width, y);
     glEnd();
-    glFlush();
   }
 }
 
@@ -120,8 +117,6 @@ void drawBitmapText(char *string, int x, int y)
   {
     glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
   }
-  glFlush();
-  glutSwapBuffers();
 }
 
 void drawButtons(void)
@@ -158,8 +153,8 @@ void drawLine(void)
       if (count < number_of_nodes - 1) {
         point2 = indexNode->next->element;
       }
-      drawingLine(point1->x, point1->y, point2->x, point2->y);
       drawCircle(point1->x, point1->y, 5);
+      drawingLine(point1->x, point1->y, point2->x, point2->y);
       count++;  
       indexNode = indexNode->next; 
     }
@@ -178,9 +173,9 @@ void draw(void)
   drawBitmapText("Tools", 2, 680);
   drawButtons();
   drawLine();
+  glutSwapBuffers();
   glFlush();
 }
-
 
 /* check what button was pressed */
 Figure checkCollision(int x, int y)
@@ -223,12 +218,11 @@ void initFlag(int x, int y)
 /* draw figure what was chosen from the buttons */
 void mouse(int button, int state, int x, int y)
 {
+  int count = 0;
   int new_y = mapState.window_height - y;
   int a;
   a = (x > 60);
   initFlag(x, new_y);
-  printf("Y -- %d\n", new_y); 
-  printf("X -- %d\n", x);
 
   if (mapState.drawing_state == DRAWING_RECT && a) {
     drawRectangle(x, new_y);
@@ -236,6 +230,7 @@ void mouse(int button, int state, int x, int y)
     drawCircle(x, new_y, 10);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
     savePoints(button, state, x, new_y);
+    draw();
   }
 }
 
@@ -251,6 +246,8 @@ int main(int argc, char *argv[])
   glutReshapeFunc(reshape);
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glutMouseFunc(mouse);
+  //glutMotionFunc();
+  //glutPassiveMotionFunc(motionPassive);
   glutMainLoop();
   free(mapState.border);
   free(mapState.button_rect);
