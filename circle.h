@@ -13,5 +13,6 @@ Button* createButtonCircle(int x, int y, int radius, int num_segments);
 Button* initCircle();
 void drawCircleButton(Button* button_circle);
 void drawCircle(int x, int y, int radius);
+void ShineCircleIfMouseOnPoint(int x, int y, int radius);
 
 #endif
