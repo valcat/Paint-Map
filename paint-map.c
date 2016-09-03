@@ -134,7 +134,6 @@ void savePoints(int button, int state, int x, int y)
     mapState.point->x = x;
     mapState.point->y = y;
     addNode(mapState.points_storage, mapState.point);
-    printf("x from storage- %d\n", mapState.point->x);
   }
 }
 
@@ -167,6 +166,25 @@ void motionPassive(int x, int y)
   glutPostRedisplay();
 }
 
+void checkPoint()
+{
+  size_t number_of_nodes = count(mapState.points_storage);
+  size_t count = 0;
+  Node* indexNode = mapState.points_storage->head;
+  Point* point1;
+
+  if (number_of_nodes >= 1) {
+  while (indexNode) {
+    point1 = indexNode->element;
+    if (point1->x == mapState.x_passive_motion) {
+      ShineCircleIfMouseOnPoint(point1->x, point1->y, 8);
+    }
+    count++;
+    indexNode = indexNode->next;
+  }
+}
+}
+
 void passiveLineMotion() 
 {
   size_t number_of_nodes = count(mapState.points_storage);
@@ -178,6 +196,7 @@ void passiveLineMotion()
     drawingLine(point1->x, point1->y, mapState.x_passive_motion, mapState.y_passive_motion);
   }
 }
+
 
 /* function that draws window with all stuff */
 void draw(void)
@@ -191,6 +210,7 @@ void draw(void)
   drawBitmapText("Tools", 2, 680);
   drawButtons();
   passiveLineMotion();
+  checkPoint();
   drawLine();
   glutSwapBuffers();
   glFlush();
