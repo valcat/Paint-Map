@@ -160,6 +160,24 @@ void drawLine(void)
     }
   }   
 }
+void motionPassive(int x, int y) 
+{
+  mapState.x_passive_motion = x;
+  mapState.y_passive_motion = mapState.window_height - y;
+  glutPostRedisplay();
+}
+
+void passiveLineMotion() 
+{
+  size_t number_of_nodes = count(mapState.points_storage);
+  Node* indexNode = mapState.points_storage->head;
+  Point* point1;
+
+  if ((mapState.startDrawingLine == YES) && (number_of_nodes >= 1)) {
+    point1 = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1);
+    drawingLine(point1->x, point1->y, mapState.x_passive_motion, mapState.y_passive_motion);
+  }
+}
 
 /* function that draws window with all stuff */
 void draw(void)
@@ -172,6 +190,7 @@ void draw(void)
   glColor3f(0, 0, 0);
   drawBitmapText("Tools", 2, 680);
   drawButtons();
+  passiveLineMotion();
   drawLine();
   glutSwapBuffers();
   glFlush();
@@ -230,6 +249,7 @@ void mouse(int button, int state, int x, int y)
     drawCircle(x, new_y, 10);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
     savePoints(button, state, x, new_y);
+    mapState.startDrawingLine = YES;
     draw();
   }
 }
@@ -247,7 +267,7 @@ int main(int argc, char *argv[])
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glutMouseFunc(mouse);
   //glutMotionFunc();
-  //glutPassiveMotionFunc(motionPassive);
+  glutPassiveMotionFunc(motionPassive);
   glutMainLoop();
   free(mapState.border);
   free(mapState.button_rect);
