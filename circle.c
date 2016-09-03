@@ -93,3 +93,21 @@ void drawCircle(int x, int y, int radius)
   glEnd();
 }
 
+void ShineCircleIfMouseOnPoint(int x, int y, int radius)
+{
+  int i;
+  int triangleAmount = 20;
+  double twicePi = 2 * M_PI;
+
+  glColor3f(0.0, 1.0, 0.0);
+  glBegin(GL_TRIANGLE_FAN);
+    /* center of circle */
+    glVertex2f(x, y); 
+    for (i = 0; i <= triangleAmount; i++) { 
+      glVertex2f(
+      x + (radius * cos(i * twicePi / triangleAmount)), 
+      y + (radius * sin(i * twicePi / triangleAmount)));
+    }
+  glEnd();
+}
+
