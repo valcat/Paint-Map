@@ -159,6 +159,7 @@ void drawLine(void)
     }
   }   
 }
+
 void motionPassive(int x, int y) 
 {
   mapState.x_passive_motion = x;
@@ -172,17 +173,21 @@ void checkPoint()
   size_t count = 0;
   Node* indexNode = mapState.points_storage->head;
   Point* point1;
+  int step = 3;
 
   if (number_of_nodes >= 1) {
-  while (indexNode) {
-    point1 = indexNode->element;
-    if (point1->x == mapState.x_passive_motion) {
-      ShineCircleIfMouseOnPoint(point1->x, point1->y, 8);
+    while (indexNode) {
+      point1 = indexNode->element;
+      if ((mapState.x_passive_motion <= point1->x + step && mapState.x_passive_motion >= point1->x - step) 
+      && (mapState.y_passive_motion <= point1->y + step && mapState.y_passive_motion >= point1->y - step)) {
+        printf(" point: x - %d, y - %d\n", point1->x, point1->y);
+        printf("passiveLineMotion x - %d, y - %d\n", mapState.x_passive_motion, mapState.y_passive_motion);
+        ShineCircleIfMouseOnPoint(point1->x, point1->y, 8);
+      }
+      count++;
+      indexNode = indexNode->next;
     }
-    count++;
-    indexNode = indexNode->next;
   }
-}
 }
 
 void passiveLineMotion() 
