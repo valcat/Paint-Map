@@ -127,7 +127,7 @@ void drawButtons(void)
   drawCircleButton(mapState.button_circle);
 }
 
-void savePoints(int button, int state, int x, int y)
+void savePoint(int button, int state, int x, int y)
 { 
   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
     mapState.point = malloc(sizeof(Point));
@@ -172,17 +172,18 @@ void checkPoint()
   size_t number_of_nodes = count(mapState.points_storage);
   size_t count = 0;
   Node* indexNode = mapState.points_storage->head;
-  Point* point1;
+  Point* point;
   int step = 3;
 
   if (number_of_nodes >= 1) {
     while (indexNode) {
-      point1 = indexNode->element;
-      if ((mapState.x_passive_motion <= point1->x + step && mapState.x_passive_motion >= point1->x - step) 
-      && (mapState.y_passive_motion <= point1->y + step && mapState.y_passive_motion >= point1->y - step)) {
-        printf(" point: x - %d, y - %d\n", point1->x, point1->y);
+      point = indexNode->element;
+      if ((mapState.x_passive_motion <= point->x + step && mapState.x_passive_motion >= point->x - step) 
+      && (mapState.y_passive_motion <= point->y + step && mapState.y_passive_motion >= point->y - step)) {
+        printf(" point: x - %d, y - %d\n", point->x, point->y);
         printf("passiveLineMotion x - %d, y - %d\n", mapState.x_passive_motion, mapState.y_passive_motion);
-        ShineCircleIfMouseOnPoint(point1->x, point1->y, 8);
+        ShineCircleIfMouseOnPoint(point->x, point->y, 8);
+        mapState.isCursorOnPoint = YES;
       }
       count++;
       indexNode = indexNode->next;
@@ -196,7 +197,7 @@ void passiveLineMotion()
   Node* indexNode = mapState.points_storage->head;
   Point* point1;
 
-  if ((mapState.startDrawingLine == YES) && (number_of_nodes >= 1)) {
+  if ((mapState.DrawingLine == START) && (number_of_nodes >= 1)) {
     point1 = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1);
     drawingLine(point1->x, point1->y, mapState.x_passive_motion, mapState.y_passive_motion);
   }
@@ -273,8 +274,8 @@ void mouse(int button, int state, int x, int y)
   } else if (mapState.drawing_state == DRAWING_CIRCLE && a) {
     drawCircle(x, new_y, 10);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
-    savePoints(button, state, x, new_y);
-    mapState.startDrawingLine = YES;
+    savePoint(button, state, x, new_y);
+    mapState.DrawingLine = START;
     draw();
   }
 }
