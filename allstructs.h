@@ -49,10 +49,15 @@ typedef enum Figure
   RECTANGLE, TRIANGLE, LINE, CIRCLE
 } Figure;
 
-typedef enum StartDrawingLine
+typedef enum DrawingLine
+{
+  START
+} DrawingLine;
+
+typedef enum IsCursorOnPoint
 {
   YES
-}StartDrawingLine;
+} IsCursorOnPoint;
 
 typedef struct MapState
 {
@@ -61,7 +66,8 @@ typedef struct MapState
   int x_passive_motion;
   int y_passive_motion;
   Drawing_state drawing_state;
-  StartDrawingLine startDrawingLine;
+  DrawingLine DrawingLine;
+  IsCursorOnPoint isCursorOnPoint;
   Point* point;
   Panel_border* border;
   Button* button_rect;
