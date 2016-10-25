@@ -1,5 +1,6 @@
 #ifndef ALLSTRUCTS_H
 #define ALLSTRUCTS_H
+#include "linked_list.h"
 
 typedef struct Point
 {
@@ -59,22 +60,38 @@ typedef enum IsCursorOnPoint
   YES
 } IsCursorOnPoint;
 
+
+typedef struct Edge
+{
+  Point* point1;
+  Point* point2;    
+} Edge;
+
+typedef struct Edges
+{
+  Edge* array;
+} Edges;
+
 typedef struct MapState
 {
   int window_width;
   int window_height;
   int x_passive_motion;
   int y_passive_motion;
+  int pressed_key;
   Drawing_state drawing_state;
   DrawingLine DrawingLine;
   IsCursorOnPoint isCursorOnPoint;
-  Point* point;
+  Point* point; // rename
+  Point* point1;
+  Point* point2;
   Panel_border* border;
   Button* button_rect;
   Button* button_triangle;
   Button* button_line;
   Button* button_circle;
   Linked_list* points_storage;
+  //Edge* array;
 } MapState;
 
 
