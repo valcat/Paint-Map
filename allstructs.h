@@ -67,11 +67,6 @@ typedef struct Edge
   Point* point2;    
 } Edge;
 
-typedef struct Edges
-{
-  Edge* array;
-} Edges;
-
 typedef struct MapState
 {
   int window_width;
@@ -91,7 +86,7 @@ typedef struct MapState
   Button* button_line;
   Button* button_circle;
   Linked_list* points_storage;
-  //Edge* array;
+  Edge* array;
 } MapState;
 
 
