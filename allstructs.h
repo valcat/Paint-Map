@@ -77,15 +77,14 @@ typedef struct MapState
   Drawing_state drawing_state;
   DrawingLine DrawingLine;
   IsCursorOnPoint isCursorOnPoint;
-  Point* point; // rename
-  Point* point1;
-  Point* point2;
+  Point* previous_point; // to save the previous point for drawing edges
   Panel_border* border;
   Button* button_rect;
   Button* button_triangle;
   Button* button_line;
   Button* button_circle;
   Linked_list* points_storage;
+  Linked_list* edges_storage;
   Edge* array;
 } MapState;
 
