@@ -12,6 +12,7 @@
 #include "rectangle.h"
 #include "line.h"
 #include "triangle.h"
+#include "graph.h"
 
 const int WIDTH_WINDOW = 1000;
 const int HEIGHT_WINDOW = 1000;
@@ -27,6 +28,7 @@ const int WIDTH_BORD = 60;
 
 MapState mapState;
 void draw(void);
+void saveEdges();
 
 
 Panel_border* createPanelBorder(int x, int y, int width)
@@ -129,15 +131,16 @@ void drawButtons(void)
 
 void savePoint(int button, int state, int x, int y)
 { 
+  Point* point;
   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-    mapState.point = malloc(sizeof(Point));
-    mapState.point->x = x;
-    mapState.point->y = y;
-    addNode(mapState.points_storage, mapState.point);
+    point = malloc(sizeof(Point));
+    point->x = x;
+    point->y = y;
+    addNode(mapState.points_storage, point);
   }
 }
 
-void drawLine(void)
+void drawPoints(void)
 {
   size_t number_of_nodes = count(mapState.points_storage);
   size_t count = 0;
@@ -153,12 +156,49 @@ void drawLine(void)
         point2 = indexNode->next->element;
       }
       drawCircle(point1->x, point1->y, 5);
-      drawingLine(point1->x, point1->y, point2->x, point2->y);
       count++;  
       indexNode = indexNode->next; 
     }
   }   
 }
+
+void saveEdgeToLinkedList(Point* point1, Point* point2)
+{
+  Edge* edge;
+  edge = createEdge(point1, point2);
+  addNode(mapState.edges_storage, edge);
+}
+
+void checkPreviousPoint(int x, int y)
+{
+  Point* point;
+  if (mapState.previous_point == NULL) {
+      point = malloc(sizeof(Point));
+      point->x = x;
+      point->y = y;
+      mapState.previous_point = point;
+      printf("i'm here\n");
+    } else {
+      point = malloc(sizeof(Point));
+      point->x = x;
+      point->y = y;
+      saveEdgeToLinkedList(mapState.previous_point, point);
+      printf("now there\n");
+    }
+}
+
+void check(int button, int state, int x, int y)
+{
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    if (mapState.pressed_key == 1) {
+      mapState.previous_point = NULL;
+      mapState.pressed_key = 0;
+    } else {
+      checkPreviousPoint(x, y);
+    }
+  }
+}
+
 
 void motionPassive(int x, int y) 
 {
@@ -180,8 +220,6 @@ void checkPoint()
       point = indexNode->element;
       if ((mapState.x_passive_motion <= point->x + step && mapState.x_passive_motion >= point->x - step) 
       && (mapState.y_passive_motion <= point->y + step && mapState.y_passive_motion >= point->y - step)) {
-        printf(" point: x - %d, y - %d\n", point->x, point->y);
-        printf("passiveLineMotion x - %d, y - %d\n", mapState.x_passive_motion, mapState.y_passive_motion);
         ShineCircleIfMouseOnPoint(point->x, point->y, 8);
         mapState.isCursorOnPoint = YES;
       }
@@ -199,7 +237,7 @@ void passiveLineMotion()
 
   if ((mapState.DrawingLine == START) && (number_of_nodes >= 1)) {
     point1 = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1);
-    drawingLine(point1->x, point1->y, mapState.x_passive_motion, mapState.y_passive_motion);
+    //drawingLine(point1->x, point1->y, mapState.x_passive_motion, mapState.y_passive_motion);
   }
 }
 
@@ -217,7 +255,7 @@ void draw(void)
   drawButtons();
   passiveLineMotion();
   checkPoint();
-  drawLine();
+  drawPoints();
   glutSwapBuffers();
   glFlush();
 }
@@ -275,10 +313,23 @@ void mouse(int button, int state, int x, int y)
     drawCircle(x, new_y, 10);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
     savePoint(button, state, x, new_y);
+    check(button, state, x, y);
     mapState.DrawingLine = START;
     draw();
   }
 }
+
+void key(int key, int x, int y) 
+{
+  switch (key) 
+  {    
+    case 101: 
+      mapState.pressed_key = 1;
+      printf("GLUT_KEY_UP %d\n",key); 
+      break;
+  }
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -294,6 +345,7 @@ int main(int argc, char *argv[])
   glutMouseFunc(mouse);
   //glutMotionFunc();
   glutPassiveMotionFunc(motionPassive);
+  glutSpecialFunc(key);
   glutMainLoop();
   free(mapState.border);
   free(mapState.button_rect);
@@ -301,7 +353,7 @@ int main(int argc, char *argv[])
   free(mapState.button_line);
   free(mapState.button_circle);
   free(mapState.points_storage);
-  free(mapState.point);
+  free(mapState.edges_storage);
 
   return 0;
 }
