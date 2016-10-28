@@ -170,10 +170,10 @@ void saveEdgeToLinkedList(Point* point1, Point* point2)
   addNode(mapState.edges_storage, edge);
 }
 
-void checkPreviousPoint(int x, int y)
+void checkPreviousPoint(int button, int state, int x, int y)
 {
   Point* point;
-
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
   point = malloc(sizeof(Point));
   point->x = x;
   point->y = y;
@@ -182,17 +182,6 @@ void checkPreviousPoint(int x, int y)
   }
   mapState.previous_point = point;
 }
-
-void check(int button, int state, int x, int y)
-{
-  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-    if (mapState.pressed_key == 1) {
-      mapState.previous_point = NULL;
-      mapState.pressed_key = 0;
-    } else {
-      checkPreviousPoint(x, y);
-    }
-  }
 }
 
 void drawEdges()
@@ -321,18 +310,19 @@ void mouse(int button, int state, int x, int y)
     drawCircle(x, new_y, 10);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
     savePoint(button, state, x, new_y);
-    check(button, state, x, new_y);
+    //check(button, state, x, new_y);
+    checkPreviousPoint(button, state, x, new_y);
     mapState.DrawingLine = START;
     draw();
   }
 }
 
-void key(int key, int x, int y) 
+void keys(unsigned char key, int x, int y) 
 {
   switch (key) 
   {    
-    case 101: 
-      mapState.pressed_key = 1;
+    case 27: 
+      mapState.previous_point = NULL;
       break;
   }
 }
@@ -352,7 +342,7 @@ int main(int argc, char *argv[])
   glutMouseFunc(mouse);
   //glutMotionFunc();
   glutPassiveMotionFunc(motionPassive);
-  glutSpecialFunc(key);
+  glutKeyboardFunc(keys);
   glutMainLoop();
   free(mapState.border);
   free(mapState.button_rect);
