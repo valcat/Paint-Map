@@ -33,7 +33,7 @@ const int SIZE_OF_POINT = 5;
 
 MapState mapState;
 void draw(void);
-void saveEdges();
+void saveEdge(Point* point1, Point* point2);
 
 
 Panel_border* createPanelBorder(int x, int y, int width)
@@ -143,6 +143,11 @@ void savePoint(int button, int state, int x, int y)
     point->x = x;
     point->y = y;
     addNode(mapState.points_storage, point);
+
+    if (mapState.previous_point != NULL) {
+      saveEdge(mapState.previous_point, point);
+    }
+    mapState.previous_point = point;
   }
 }
 
@@ -173,20 +178,6 @@ void saveEdge(Point* point1, Point* point2)
   Edge* edge;
   edge = createEdge(point1, point2);
   addNode(mapState.edges_storage, edge);
-}
-
-void checkPreviousPoint(int button, int state, int x, int y)
-{
-  Point* point;
-  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-  point = malloc(sizeof(Point));
-  point->x = x;
-  point->y = y;
-  if (mapState.previous_point != NULL) {
-    saveEdge(mapState.previous_point, point);
-  }
-  mapState.previous_point = point;
-}
 }
 
 void drawEdges()
@@ -314,7 +305,6 @@ void mouse(int button, int state, int x, int y)
     drawCircle(x, new_y, CIRCLE_DIAMETER);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
     savePoint(button, state, x, new_y);
-    checkPreviousPoint(button, state, x, new_y);
     mapState.DrawingLine = START;
     draw();
   }
