@@ -50,6 +50,7 @@ void init(void)
   mapState.button_circle = initCircle();
   
   mapState.points_storage = createLinkedList();
+  mapState.edges_storage = createLinkedList();
 }
 
 void reshape(int width, int height)
@@ -172,19 +173,14 @@ void saveEdgeToLinkedList(Point* point1, Point* point2)
 void checkPreviousPoint(int x, int y)
 {
   Point* point;
-  if (mapState.previous_point == NULL) {
-      point = malloc(sizeof(Point));
-      point->x = x;
-      point->y = y;
-      mapState.previous_point = point;
-      printf("i'm here\n");
-    } else {
-      point = malloc(sizeof(Point));
-      point->x = x;
-      point->y = y;
-      saveEdgeToLinkedList(mapState.previous_point, point);
-      printf("now there\n");
-    }
+
+  point = malloc(sizeof(Point));
+  point->x = x;
+  point->y = y;
+  if (mapState.previous_point != NULL) {
+    saveEdgeToLinkedList(mapState.previous_point, point);
+  }
+  mapState.previous_point = point;
 }
 
 void check(int button, int state, int x, int y)
@@ -199,6 +195,17 @@ void check(int button, int state, int x, int y)
   }
 }
 
+void drawEdges()
+{
+  Node* indexNode = mapState.edges_storage->head;
+  Edge* edge;
+
+  while (indexNode) {  
+    edge = indexNode->element; 
+    drawingLine(edge->point1->x, edge->point1->y, edge->point2->x, edge->point2->y);
+    indexNode = indexNode->next; 
+  }
+}
 
 void motionPassive(int x, int y) 
 {
@@ -256,6 +263,7 @@ void draw(void)
   passiveLineMotion();
   checkPoint();
   drawPoints();
+  drawEdges();
   glutSwapBuffers();
   glFlush();
 }
@@ -313,7 +321,7 @@ void mouse(int button, int state, int x, int y)
     drawCircle(x, new_y, 10);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
     savePoint(button, state, x, new_y);
-    check(button, state, x, y);
+    check(button, state, x, new_y);
     mapState.DrawingLine = START;
     draw();
   }
@@ -325,7 +333,6 @@ void key(int key, int x, int y)
   {    
     case 101: 
       mapState.pressed_key = 1;
-      printf("GLUT_KEY_UP %d\n",key); 
       break;
   }
 }
