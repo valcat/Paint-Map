@@ -25,6 +25,11 @@ const int STEP = 20;
 const int X_BORD = 0;
 const int Y_BORD = 0;
 const int WIDTH_BORD = 60;
+const int CIRCLE_DIAMETER = 10;
+const int BITMAPTEXT_X = 2;
+const int BITMAPTEXT_Y = 680;
+const int SIZE_OF_SHINING_CIRCLE = 8;
+const int SIZE_OF_POINT = 5;
 
 MapState mapState;
 void draw(void);
@@ -156,14 +161,14 @@ void drawPoints(void)
       if (count < number_of_nodes - 1) {
         point2 = indexNode->next->element;
       }
-      drawCircle(point1->x, point1->y, 5);
+      drawCircle(point1->x, point1->y, SIZE_OF_POINT);
       count++;  
       indexNode = indexNode->next; 
     }
   }   
 }
 
-void saveEdgeToLinkedList(Point* point1, Point* point2)
+void saveEdge(Point* point1, Point* point2)
 {
   Edge* edge;
   edge = createEdge(point1, point2);
@@ -178,7 +183,7 @@ void checkPreviousPoint(int button, int state, int x, int y)
   point->x = x;
   point->y = y;
   if (mapState.previous_point != NULL) {
-    saveEdgeToLinkedList(mapState.previous_point, point);
+    saveEdge(mapState.previous_point, point);
   }
   mapState.previous_point = point;
 }
@@ -216,7 +221,7 @@ void checkPoint()
       point = indexNode->element;
       if ((mapState.x_passive_motion <= point->x + step && mapState.x_passive_motion >= point->x - step) 
       && (mapState.y_passive_motion <= point->y + step && mapState.y_passive_motion >= point->y - step)) {
-        ShineCircleIfMouseOnPoint(point->x, point->y, 8);
+        ShineCircleIfMouseOnPoint(point->x, point->y, SIZE_OF_SHINING_CIRCLE);
         mapState.isCursorOnPoint = YES;
       }
       count++;
@@ -233,7 +238,7 @@ void passiveLineMotion()
 
   if ((mapState.DrawingLine == START) && (number_of_nodes >= 1)) {
     point1 = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1);
-    //drawingLine(point1->x, point1->y, mapState.x_passive_motion, mapState.y_passive_motion);
+    drawingLine(point1->x, point1->y, mapState.x_passive_motion, mapState.y_passive_motion);
   }
 }
 
@@ -247,7 +252,7 @@ void draw(void)
   drawGrid();
   drawPanel(mapState.border);
   glColor3f(0, 0, 0);
-  drawBitmapText("Tools", 2, 680);
+  drawBitmapText("Tools", BITMAPTEXT_X, BITMAPTEXT_Y);
   drawButtons();
   passiveLineMotion();
   checkPoint();
@@ -277,11 +282,11 @@ Figure checkCollision(int x, int y)
 
 void initFlag(int x, int y) 
 {
-  int beginig_x = 20;
-  int end_x = 40;
+  int beginig_of_button_x = 20;
+  int end_of_button_x = 40;
   Figure figure;
 
-  if (x > beginig_x && x < end_x) {
+  if (x > beginig_of_button_x && x < end_of_button_x) {
     figure = checkCollision(x, y);   
   } 
   if (figure == RECTANGLE) {
@@ -298,19 +303,17 @@ void initFlag(int x, int y)
 /* draw figure what was chosen from the buttons */
 void mouse(int button, int state, int x, int y)
 {
-  int count = 0;
   int new_y = mapState.window_height - y;
   int a;
-  a = (x > 60);
+  a = (x > PANEL_BORD_PADDING);
   initFlag(x, new_y);
 
   if (mapState.drawing_state == DRAWING_RECT && a) {
     drawRectangle(x, new_y);
   } else if (mapState.drawing_state == DRAWING_CIRCLE && a) {
-    drawCircle(x, new_y, 10);
+    drawCircle(x, new_y, CIRCLE_DIAMETER);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
     savePoint(button, state, x, new_y);
-    //check(button, state, x, new_y);
     checkPreviousPoint(button, state, x, new_y);
     mapState.DrawingLine = START;
     draw();
@@ -321,12 +324,12 @@ void keys(unsigned char key, int x, int y)
 {
   switch (key) 
   {    
-    case 27: 
+    case 27: //ASCII key for Escape
       mapState.previous_point = NULL;
+      mapState.DrawingLine = FINISH;
       break;
   }
 }
-
 
 int main(int argc, char *argv[])
 {
