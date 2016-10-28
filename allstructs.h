@@ -73,7 +73,6 @@ typedef struct MapState
   int window_height;
   int x_passive_motion;
   int y_passive_motion;
-  int pressed_key;
   Drawing_state drawing_state;
   DrawingLine DrawingLine;
   IsCursorOnPoint isCursorOnPoint;
@@ -85,7 +84,6 @@ typedef struct MapState
   Button* button_circle;
   Linked_list* points_storage;
   Linked_list* edges_storage;
-  Edge* array;
 } MapState;
 
 
