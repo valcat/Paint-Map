@@ -52,13 +52,13 @@ typedef enum Figure
 
 typedef enum DrawingLine
 {
-  START
+  START, FINISH
 } DrawingLine;
 
-typedef enum IsCursorOnPoint
+typedef enum CursorOnPoint
 {
-  YES
-} IsCursorOnPoint;
+  YES, NO
+} CursorOnPoint;
 
 
 typedef struct Edge
@@ -75,7 +75,7 @@ typedef struct MapState
   int y_passive_motion;
   Drawing_state drawing_state;
   DrawingLine DrawingLine;
-  IsCursorOnPoint isCursorOnPoint;
+  CursorOnPoint CursorOnPoint;
   Point* previous_point; // to save the previous point for drawing edges
   Panel_border* border;
   Button* button_rect;
