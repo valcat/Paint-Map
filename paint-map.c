@@ -213,7 +213,7 @@ void checkPoint()
       if ((mapState.x_passive_motion <= point->x + step && mapState.x_passive_motion >= point->x - step) 
       && (mapState.y_passive_motion <= point->y + step && mapState.y_passive_motion >= point->y - step)) {
         ShineCircleIfMouseOnPoint(point->x, point->y, SIZE_OF_SHINING_CIRCLE);
-        mapState.isCursorOnPoint = YES;
+        mapState.CursorOnPoint = YES;
       }
       count++;
       indexNode = indexNode->next;
