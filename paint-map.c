@@ -34,6 +34,7 @@ const int SIZE_OF_POINT = 5;
 MapState mapState;
 void draw(void);
 void saveEdge(Point* point1, Point* point2);
+void findLastPoint();
 
 
 Panel_border* createPanelBorder(int x, int y, int width)
@@ -151,6 +152,13 @@ void savePoint(int button, int state, int x, int y)
   }
 }
 
+void saveEdge(Point* point1, Point* point2)
+{
+  Edge* edge;
+  edge = createEdge(point1, point2);
+  addNode(mapState.edges_storage, edge);
+}
+
 void drawPoints(void)
 {
   size_t number_of_nodes = count(mapState.points_storage);
@@ -173,13 +181,6 @@ void drawPoints(void)
   }   
 }
 
-void saveEdge(Point* point1, Point* point2)
-{
-  Edge* edge;
-  edge = createEdge(point1, point2);
-  addNode(mapState.edges_storage, edge);
-}
-
 void drawEdges()
 {
   Node* indexNode = mapState.edges_storage->head;
@@ -192,14 +193,7 @@ void drawEdges()
   }
 }
 
-void motionPassive(int x, int y) 
-{
-  mapState.x_passive_motion = x;
-  mapState.y_passive_motion = mapState.window_height - y;
-  glutPostRedisplay();
-}
-
-void checkPoint()
+void checkPointWhilePlacingCursor()
 {
   size_t number_of_nodes = count(mapState.points_storage);
   size_t count = 0;
@@ -212,8 +206,8 @@ void checkPoint()
       point = indexNode->element;
       if ((mapState.x_passive_motion <= point->x + step && mapState.x_passive_motion >= point->x - step) 
       && (mapState.y_passive_motion <= point->y + step && mapState.y_passive_motion >= point->y - step)) {
-        ShineCircleIfMouseOnPoint(point->x, point->y, SIZE_OF_SHINING_CIRCLE);
-        mapState.CursorOnPoint = YES;
+        mapState.point_while_placing_cursor = point;
+        mapState.IsCursorOnPoint = true;
       }
       count++;
       indexNode = indexNode->next;
@@ -221,15 +215,39 @@ void checkPoint()
   }
 }
 
+void checkPointToShineIt()
+{
+  if ((mapState.IsCursorOnPoint == true) && (mapState.last_point->x != mapState.point_while_placing_cursor->x)) {
+    ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
+    mapState.IsPointWasShone = true;
+  }
+}
+
+void findLastPoint()
+{
+  size_t number_of_nodes = count(mapState.points_storage);
+
+  if (number_of_nodes >= 1) {
+    mapState.last_point = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1); 
+  }
+}
+
+void motionPassive(int x, int y) 
+{
+  mapState.x_passive_motion = x;
+  mapState.y_passive_motion = mapState.window_height - y;
+  glutPostRedisplay();
+}
+
 void passiveLineMotion() 
 {
   size_t number_of_nodes = count(mapState.points_storage);
   Node* indexNode = mapState.points_storage->head;
-  Point* point1;
+  Point* point;
 
   if ((mapState.DrawingLine == START) && (number_of_nodes >= 1)) {
-    point1 = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1);
-    drawingLine(point1->x, point1->y, mapState.x_passive_motion, mapState.y_passive_motion);
+    point = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1);
+    drawingLine(point->x, point->y, mapState.x_passive_motion, mapState.y_passive_motion);
   }
 }
 
@@ -246,9 +264,10 @@ void draw(void)
   drawBitmapText("Tools", BITMAPTEXT_X, BITMAPTEXT_Y);
   drawButtons();
   passiveLineMotion();
-  checkPoint();
+  checkPointWhilePlacingCursor();
   drawPoints();
   drawEdges();
+  checkPointToShineIt();
   glutSwapBuffers();
   glFlush();
 }
@@ -298,13 +317,14 @@ void mouse(int button, int state, int x, int y)
   int a;
   a = (x > PANEL_BORD_PADDING);
   initFlag(x, new_y);
-
+  printf("point x main %d\n", x);
   if (mapState.drawing_state == DRAWING_RECT && a) {
     drawRectangle(x, new_y);
   } else if (mapState.drawing_state == DRAWING_CIRCLE && a) {
     drawCircle(x, new_y, CIRCLE_DIAMETER);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
     savePoint(button, state, x, new_y);
+    findLastPoint();
     mapState.DrawingLine = START;
     draw();
   }
@@ -333,7 +353,6 @@ int main(int argc, char *argv[])
   glutReshapeFunc(reshape);
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glutMouseFunc(mouse);
-  //glutMotionFunc();
   glutPassiveMotionFunc(motionPassive);
   glutKeyboardFunc(keys);
   glutMainLoop();
