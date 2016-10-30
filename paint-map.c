@@ -146,7 +146,21 @@ void savePoint(int button, int state, int x, int y)
     addNode(mapState.points_storage, point);
 
     if (mapState.previous_point != NULL) {
-      saveEdge(mapState.previous_point, point);
+
+      Point* second_point = point;
+      printf("here\n");
+
+      if (mapState.IsPointWasShone == true) {
+        second_point = mapState.point_while_placing_cursor;
+        printf("i'm inside if\n");
+      } 
+      printf("now there\n");
+      saveEdge(mapState.previous_point, second_point);
+
+    } else if ((mapState.previous_point == NULL) && (mapState.IsPointWasShone == true) ) {
+      saveEdge(mapState.point_while_placing_cursor, point);
+      mapState.previous_point = mapState.point_while_placing_cursor;
+      printf(" mapState X %d\n", mapState.previous_point->x );
     }
     mapState.previous_point = point;
   }
@@ -174,7 +188,7 @@ void drawPoints(void)
       if (count < number_of_nodes - 1) {
         point2 = indexNode->next->element;
       }
-      drawCircle(point1->x, point1->y, SIZE_OF_POINT);
+      //drawCircle(point1->x, point1->y, SIZE_OF_POINT);
       count++;  
       indexNode = indexNode->next; 
     }
@@ -221,11 +235,14 @@ void checkPointToShineIt()
 
     if (mapState.previous_point == NULL) {
       ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
-    } else if ((mapState.previous_point != NULL) && (mapState.last_point->x != mapState.point_while_placing_cursor->x)) {
+    } 
+    else if ((mapState.previous_point != NULL) && (mapState.last_point->x != mapState.point_while_placing_cursor->x)) {
       ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
-      }
+    }
     mapState.IsPointWasShone = true;
     mapState.IsCursorOnPoint = false;
+  } else {
+    mapState.IsPointWasShone = false;
   }
 }
 
@@ -270,9 +287,9 @@ void draw(void)
   drawBitmapText("Tools", BITMAPTEXT_X, BITMAPTEXT_Y);
   drawButtons();
   passiveLineMotion();
-  checkPointWhilePlacingCursor();
   drawPoints();
   drawEdges();
+  checkPointWhilePlacingCursor();
   checkPointToShineIt();
   glutSwapBuffers();
   glFlush();
