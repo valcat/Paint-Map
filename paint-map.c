@@ -220,6 +220,7 @@ void checkPointToShineIt()
   if ((mapState.IsCursorOnPoint == true) && (mapState.last_point->x != mapState.point_while_placing_cursor->x)) {
     ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
     mapState.IsPointWasShone = true;
+    mapState.IsCursorOnPoint = false;
   }
 }
 
