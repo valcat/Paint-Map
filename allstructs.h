@@ -1,6 +1,7 @@
 #ifndef ALLSTRUCTS_H
 #define ALLSTRUCTS_H
 #include "linked_list.h"
+#include <stdbool.h>
 
 typedef struct Point
 {
@@ -55,17 +56,15 @@ typedef enum DrawingLine
   START, FINISH
 } DrawingLine;
 
-typedef enum CursorOnPoint
-{
-  YES, NO
-} CursorOnPoint;
-
 
 typedef struct Edge
 {
   Point* point1;
   Point* point2;    
 } Edge;
+
+
+typedef enum {FALSE = 0, TRUE} boolean;
 
 typedef struct MapState
 {
@@ -75,8 +74,11 @@ typedef struct MapState
   int y_passive_motion;
   Drawing_state drawing_state;
   DrawingLine DrawingLine;
-  CursorOnPoint CursorOnPoint;
   Point* previous_point; // to save the previous point for drawing edges
+  Point* last_point;
+  Point* point_while_placing_cursor;
+  boolean IsCursorOnPoint;
+  boolean IsPointWasShone;
   Panel_border* border;
   Button* button_rect;
   Button* button_triangle;
