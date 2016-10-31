@@ -78,7 +78,8 @@ typedef struct MapState
   Point* last_point;
   Point* point_while_placing_cursor;
   boolean IsCursorOnPoint;
-  boolean IsPointWasShone;
+  boolean WasPointShone;
+  boolean WasPointSaved;
   Panel_border* border;
   Button* button_rect;
   Button* button_triangle;
