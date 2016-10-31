@@ -140,27 +140,29 @@ void savePoint(int button, int state, int x, int y)
 { 
   Point* point;
   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    if (mapState.WasPointShone == true) {
+      point = mapState.point_while_placing_cursor;
+      mapState.WasPointSaved = false;
+    } else {
     point = malloc(sizeof(Point));
     point->x = x;
     point->y = y;
     addNode(mapState.points_storage, point);
+    mapState.WasPointSaved = true;
+    }
 
     if (mapState.previous_point != NULL) {
 
       Point* second_point = point;
-      printf("here\n");
 
-      if (mapState.IsPointWasShone == true) {
+      if (mapState.WasPointShone == true) {
         second_point = mapState.point_while_placing_cursor;
-        printf("i'm inside if\n");
       } 
-      printf("now there\n");
       saveEdge(mapState.previous_point, second_point);
 
-    } else if ((mapState.previous_point == NULL) && (mapState.IsPointWasShone == true) ) {
+    } else if ((mapState.previous_point == NULL) && (mapState.WasPointShone == true) ) {
       saveEdge(mapState.point_while_placing_cursor, point);
       mapState.previous_point = mapState.point_while_placing_cursor;
-      printf(" mapState X %d\n", mapState.previous_point->x );
     }
     mapState.previous_point = point;
   }
@@ -188,7 +190,7 @@ void drawPoints(void)
       if (count < number_of_nodes - 1) {
         point2 = indexNode->next->element;
       }
-      //drawCircle(point1->x, point1->y, SIZE_OF_POINT);
+      drawCircle(point1->x, point1->y, SIZE_OF_POINT);
       count++;  
       indexNode = indexNode->next; 
     }
@@ -239,10 +241,10 @@ void checkPointToShineIt()
     else if ((mapState.previous_point != NULL) && (mapState.last_point->x != mapState.point_while_placing_cursor->x)) {
       ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
     }
-    mapState.IsPointWasShone = true;
+    mapState.WasPointShone = true;
     mapState.IsCursorOnPoint = false;
   } else {
-    mapState.IsPointWasShone = false;
+    mapState.WasPointShone = false;
   }
 }
 
@@ -250,8 +252,12 @@ void findLastPoint()
 {
   size_t number_of_nodes = count(mapState.points_storage);
 
-  if (number_of_nodes >= 1) {
-    mapState.last_point = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1); 
+  if (number_of_nodes != 0) {
+    if (mapState.WasPointSaved == false) {
+      mapState.last_point = mapState.point_while_placing_cursor;
+    } else {
+      mapState.last_point = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1); 
+    }
   }
 }
 
@@ -268,9 +274,8 @@ void passiveLineMotion()
   Node* indexNode = mapState.points_storage->head;
   Point* point;
 
-  if ((mapState.DrawingLine == START) && (number_of_nodes >= 1)) {
-    point = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1);
-    drawingLine(point->x, point->y, mapState.x_passive_motion, mapState.y_passive_motion);
+  if ((mapState.DrawingLine == START) && (number_of_nodes != 0)) {
+    drawingLine(mapState.last_point->x, mapState.last_point->y, mapState.x_passive_motion, mapState.y_passive_motion);
   }
 }
 
@@ -340,7 +345,6 @@ void mouse(int button, int state, int x, int y)
   int a;
   a = (x > PANEL_BORD_PADDING);
   initFlag(x, new_y);
-  printf("point x main %d\n", x);
   if (mapState.drawing_state == DRAWING_RECT && a) {
     drawRectangle(x, new_y);
   } else if (mapState.drawing_state == DRAWING_CIRCLE && a) {
