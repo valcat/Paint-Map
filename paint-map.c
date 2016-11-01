@@ -144,12 +144,12 @@ void savePoint(int button, int state, int x, int y)
       point = mapState.point_while_placing_cursor;
       mapState.WasPointSaved = false;
     } else {
-    point = malloc(sizeof(Point));
-    point->x = x;
-    point->y = y;
-    addNode(mapState.points_storage, point);
-    mapState.WasPointSaved = true;
-    }
+      point = malloc(sizeof(Point));
+      point->x = x;
+      point->y = y;
+      addNode(mapState.points_storage, point);
+      mapState.WasPointSaved = true;
+      }
 
     if (mapState.previous_point != NULL) {
 
@@ -163,7 +163,7 @@ void savePoint(int button, int state, int x, int y)
     } else if ((mapState.previous_point == NULL) && (mapState.WasPointShone == true) ) {
       saveEdge(mapState.point_while_placing_cursor, point);
       mapState.previous_point = mapState.point_while_placing_cursor;
-    }
+      }
     mapState.previous_point = point;
   }
 }
@@ -237,8 +237,7 @@ void checkPointToShineIt()
 
     if (mapState.previous_point == NULL) {
       ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
-    } 
-    else if ((mapState.previous_point != NULL) && (mapState.last_point->x != mapState.point_while_placing_cursor->x)) {
+    } else if ((mapState.previous_point != NULL) && (mapState.last_point->x != mapState.point_while_placing_cursor->x)) {
       ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
     }
     mapState.WasPointShone = true;
@@ -312,7 +311,7 @@ Figure checkCollision(int x, int y)
     figure = LINE;
   } else if(y > mapState.button_circle->point_circle.y - (side_of_figure / 2) 
     && y < mapState.button_circle->point_circle.y + (side_of_figure / 2)) {
-      figure = CIRCLE;
+    figure = CIRCLE;
   }
 
   return figure;
