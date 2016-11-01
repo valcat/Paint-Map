@@ -16,6 +16,11 @@ typedef struct Rectangle
   int height;
 } Rectangle;
 
+typedef struct Panel_border
+{
+  Rectangle rect;
+} Panel_border;
+
 typedef struct Button
 {
   Rectangle rect;
@@ -32,6 +37,11 @@ typedef struct Button
   int num_segments;
 } Button;
 
+typedef enum Figure 
+{
+  RECTANGLE, TRIANGLE, LINE, CIRCLE
+} Figure;
+
 typedef enum Drawing_state 
 {
   DRAWING_TRIANGlE,
@@ -40,16 +50,6 @@ typedef enum Drawing_state
   DRAWING_LINE,
   DEFAULT_STATE
 } Drawing_state;
-
-typedef struct Panel_border
-{
-  Rectangle rect;
-} Panel_border;
-
-typedef enum Figure 
-{
-  RECTANGLE, TRIANGLE, LINE, CIRCLE
-} Figure;
 
 typedef enum DrawingLine
 {
@@ -62,7 +62,6 @@ typedef struct Edge
   Point* point1;
   Point* point2;    
 } Edge;
-
 
 typedef enum {FALSE = 0, TRUE} boolean;
 
