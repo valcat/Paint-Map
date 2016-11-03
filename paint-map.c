@@ -247,6 +247,7 @@ void checkPointToShineIt()
   }
 }
 
+//function is used to find last point that was marked by the user
 void findLastPoint()
 {
   size_t number_of_nodes = count(mapState.points_storage);
