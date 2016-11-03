@@ -267,6 +267,7 @@ void motionPassive(int x, int y)
   glutPostRedisplay();
 }
 
+//function is used to draw a line while moving cursor from the one point to find place to click for another point
 void passiveLineMotion() 
 {
   size_t number_of_nodes = count(mapState.points_storage);
