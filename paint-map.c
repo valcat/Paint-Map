@@ -13,6 +13,7 @@
 #include "line.h"
 #include "triangle.h"
 #include "graph.h"
+#include "find_path.h"
 
 const int WIDTH_WINDOW = 1000;
 const int HEIGHT_WINDOW = 1000;
@@ -280,6 +281,24 @@ void passiveLineMotion()
   }
 }
 
+void printLengthOfEdge()
+{
+  size_t number_of_nodes = count(mapState.edges_storage);
+  size_t count = 0;
+  Node* indexNode = mapState.edges_storage->head;
+  Edge* edge;
+  double length;
+
+  if (number_of_nodes >= 1) {
+    while (indexNode) {
+      edge = indexNode->element;
+      length = findLengthOfEdge(edge->point1->x, edge->point1->y, edge->point2->x, edge->point2->y);
+      count++;
+      indexNode = indexNode->next;
+    }
+  }
+}
+
 
 /* function that draws window with all stuff */
 void draw(void)
@@ -355,6 +374,7 @@ void mouse(int button, int state, int x, int y)
     findLastPoint();
     mapState.DrawingLine = START;
     draw();
+    printLengthOfEdge();
   }
 }
 
