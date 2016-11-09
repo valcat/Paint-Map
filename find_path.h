@@ -3,6 +3,6 @@
 #include "allstructs.h"
 #include "linked_list.h"
 
-double findLengthOfEdge(int point1_x, int point1_y, int point2_x, int point2_y) 
+double findLengthOfEdge(int point1_x, int point1_y, int point2_x, int point2_y);
 
 #endif
