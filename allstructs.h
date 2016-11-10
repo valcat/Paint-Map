@@ -7,6 +7,7 @@ typedef struct Point
 {
   int x;
   int y;
+  Linked_list linked_list;
 } Point;
 
 typedef struct Rectangle
