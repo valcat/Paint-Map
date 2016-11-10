@@ -148,7 +148,6 @@ void savePoint(int button, int state, int x, int y)
       point = malloc(sizeof(Point));
       point->x = x;
       point->y = y;
-      addNode(mapState.points_storage, point);
       mapState.WasPointSaved = true;
       }
 
@@ -161,11 +160,14 @@ void savePoint(int button, int state, int x, int y)
       } 
       saveEdge(mapState.previous_point, second_point);
 
+
     } else if ((mapState.previous_point == NULL) && (mapState.WasPointShone == true) ) {
       saveEdge(mapState.point_while_placing_cursor, point);
       mapState.previous_point = mapState.point_while_placing_cursor;
       }
+      
     mapState.previous_point = point;
+    addNode(mapState.points_storage, point);
   }
 }
 
