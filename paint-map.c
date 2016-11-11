@@ -160,7 +160,6 @@ void savePoint(int button, int state, int x, int y)
       } 
       saveEdge(mapState.previous_point, second_point);
 
-
     } else if ((mapState.previous_point == NULL) && (mapState.WasPointShone == true) ) {
       saveEdge(mapState.point_while_placing_cursor, point);
       mapState.previous_point = mapState.point_while_placing_cursor;
@@ -301,7 +300,6 @@ void printLengthOfEdge()
   }
 }
 
-
 /* function that draws window with all stuff */
 void draw(void)
 {
@@ -336,7 +334,7 @@ Figure checkCollision(int x, int y)
     && y < mapState.button_circle->point_circle.y + (side_of_figure / 2)) {
     figure = CIRCLE;
   }
-
+  
   return figure;
 }
 
