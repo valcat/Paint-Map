@@ -8,11 +8,6 @@
 #include <math.h>
 #include "linked_list.h"
 #include "allstructs.h"
-#include "circle.h"
-#include "rectangle.h"
-#include "line.h"
-#include "triangle.h"
-#include "graph.h"
 
 double findLengthOfEdge(int point1_x, int point1_y, int point2_x, int point2_y) 
 {
