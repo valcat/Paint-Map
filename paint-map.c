@@ -149,6 +149,7 @@ void savePoint(int button, int state, int x, int y)
       point->x = x;
       point->y = y;
       mapState.WasPointSaved = true;
+      addNode(mapState.points_storage, point);
       }
 
     if (mapState.previous_point != NULL) {
@@ -166,7 +167,6 @@ void savePoint(int button, int state, int x, int y)
       }
       
     mapState.previous_point = point;
-    addNode(mapState.points_storage, point);
   }
 }
 
