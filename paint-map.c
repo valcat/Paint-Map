@@ -36,6 +36,7 @@ MapState mapState;
 void draw(void);
 void saveEdge(Point* point1, Point* point2);
 void findLastPoint();
+int returnIndexOfPoint();
 
 
 Panel_border* createPanelBorder(int x, int y, int width)
@@ -137,35 +138,46 @@ void drawButtons(void)
   drawCircleButton(mapState.button_circle);
 }
 
-void savePoint(int button, int state, int x, int y)
+void savePointAndEdge(int button, int state, int x, int y)
 { 
   Point* point;
+  Edge* edge;
+  Point* second_point;
   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+
     if (mapState.WasPointShone == true) {
       point = mapState.point_while_placing_cursor;
       mapState.WasPointSaved = false;
     } else {
       point = malloc(sizeof(Point));
+      point->edges_list = malloc(sizeof(Linked_list));
       point->x = x;
       point->y = y;
       mapState.WasPointSaved = true;
       addNode(mapState.points_storage, point);
-      }
+    }
+
+    second_point = point;
 
     if (mapState.previous_point != NULL) {
-
-      Point* second_point = point;
-
       if (mapState.WasPointShone == true) {
         second_point = mapState.point_while_placing_cursor;
       } 
-      saveEdge(mapState.previous_point, second_point);
+      // saveEdge(mapState.previous_point, second_point);
+    
+      edge = createEdge(mapState.previous_point, second_point);
+      addNode(mapState.edges_storage, edge);
 
-    } else if ((mapState.previous_point == NULL) && (mapState.WasPointShone == true) ) {
-      saveEdge(mapState.point_while_placing_cursor, point);
+      printf("%p\n", mapState.previous_point->edges_list);
+      printf("%d %d  -\n", mapState.previous_point->x, mapState.previous_point->y);
+      addNode(mapState.previous_point->edges_list, (void*)edge);
+      //addNode(second_point->edges_list, edge);
+
+    } else if ((mapState.previous_point == NULL) && (mapState.WasPointShone == true)) {
       mapState.previous_point = mapState.point_while_placing_cursor;
-      }
-      
+      saveEdge(mapState.previous_point, second_point);    
+    }
+
     mapState.previous_point = point;
   }
 }
@@ -176,6 +188,8 @@ void saveEdge(Point* point1, Point* point2)
   edge = createEdge(point1, point2);
   addNode(mapState.edges_storage, edge);
 }
+
+
 
 void drawPoints(void)
 {
@@ -226,6 +240,25 @@ void checkPointWhilePlacingCursor()
       && (mapState.y_passive_motion <= point->y + step && mapState.y_passive_motion >= point->y - step)) {
         mapState.point_while_placing_cursor = point;
         mapState.IsCursorOnPoint = true;
+      }
+      count++;
+      indexNode = indexNode->next;
+    }
+  }
+}
+
+int returnIndexOfPoint()
+{
+  size_t number_of_nodes = count(mapState.points_storage);
+  int count = 0;
+  Node* indexNode = mapState.points_storage->head;
+  Point* point;
+
+  if (number_of_nodes >= 1) {
+    while (indexNode) {
+      point = indexNode->element;
+      if (point == mapState.point_while_placing_cursor) {
+        return count;
       }
       count++;
       indexNode = indexNode->next;
@@ -370,11 +403,12 @@ void mouse(int button, int state, int x, int y)
   } else if (mapState.drawing_state == DRAWING_CIRCLE && a) {
     drawCircle(x, new_y, CIRCLE_DIAMETER);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
-    savePoint(button, state, x, new_y);
+    savePointAndEdge(button, state, x, new_y);
     findLastPoint();
     mapState.DrawingLine = START;
     draw();
     printLengthOfEdge();
+    //markShortestEdge();
   }
 }
 
