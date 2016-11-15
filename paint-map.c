@@ -35,7 +35,6 @@ const int SIZE_OF_POINT = 5;
 MapState mapState;
 void draw(void);
 void saveEdge(Point* point1, Point* point2);
-void findLastPoint();
 int returnIndexOfPoint();
 
 
@@ -169,8 +168,8 @@ void savePointAndEdge(int button, int state, int x, int y)
       addNode(mapState.edges_storage, edge);
 
       printf("%p\n", mapState.previous_point->edges_list);
-      printf("%d %d  -\n", mapState.previous_point->x, mapState.previous_point->y);
-      addNode(mapState.previous_point->edges_list, (void*)edge);
+      printf("%d %d", mapState.previous_point->x, mapState.previous_point->y);
+      //addNode(mapState.previous_point->edges_list, edge);
       //addNode(second_point->edges_list, edge);
 
     } else if ((mapState.previous_point == NULL) && (mapState.WasPointShone == true)) {
@@ -188,8 +187,6 @@ void saveEdge(Point* point1, Point* point2)
   edge = createEdge(point1, point2);
   addNode(mapState.edges_storage, edge);
 }
-
-
 
 void drawPoints(void)
 {
@@ -225,7 +222,7 @@ void drawEdges()
   }
 }
 
-void checkPointWhilePlacingCursor()
+void checkSelectedPoint()
 {
   size_t number_of_nodes = count(mapState.points_storage);
   size_t count = 0;
@@ -282,20 +279,6 @@ void checkPointToShineIt()
   }
 }
 
-//function is used to find last point that was marked by the user
-void findLastPoint()
-{
-  size_t number_of_nodes = count(mapState.points_storage);
-
-  if (number_of_nodes != 0) {
-    if (mapState.WasPointSaved == false) {
-      mapState.last_point = mapState.point_while_placing_cursor;
-    } else {
-      mapState.last_point = (Point*)getByIndex(mapState.points_storage, number_of_nodes - 1); 
-    }
-  }
-}
-
 void motionPassive(int x, int y) 
 {
   mapState.x_passive_motion = x;
@@ -311,7 +294,7 @@ void passiveLineMotion()
   Point* point;
 
   if ((mapState.DrawingLine == START) && (number_of_nodes != 0)) {
-    drawingLine(mapState.last_point->x, mapState.last_point->y, mapState.x_passive_motion, mapState.y_passive_motion);
+    drawingLine(mapState.previous_point->x, mapState.previous_point->y, mapState.x_passive_motion, mapState.y_passive_motion);
   }
 }
 
@@ -347,7 +330,7 @@ void draw(void)
   passiveLineMotion();
   drawPoints();
   drawEdges();
-  checkPointWhilePlacingCursor();
+  checkSelectedPoint();
   checkPointToShineIt();
   glutSwapBuffers();
   glFlush();
