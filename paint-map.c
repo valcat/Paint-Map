@@ -233,8 +233,8 @@ void checkSelectedPoint()
   if (number_of_nodes >= 1) {
     while (indexNode) {
       point = indexNode->element;
-      if ((mapState.x_passive_motion <= point->x + step && mapState.x_passive_motion >= point->x - step) 
-      && (mapState.y_passive_motion <= point->y + step && mapState.y_passive_motion >= point->y - step)) {
+      if ((mapState.passive_motion_point->x <= point->x + step && mapState.passive_motion_point->x >= point->x - step) 
+      && (mapState.passive_motion_point->y <= point->y + step && mapState.passive_motion_point->y >= point->y - step)) {
         mapState.point_while_placing_cursor = point;
         mapState.IsCursorOnPoint = true;
       }
@@ -269,7 +269,7 @@ void checkPointToShineIt()
 
     if (mapState.previous_point == NULL) {
       ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
-    } else if ((mapState.previous_point != NULL) && (mapState.last_point->x != mapState.point_while_placing_cursor->x)) {
+    } else if ((mapState.previous_point != NULL) && (mapState.previous_point->x != mapState.point_while_placing_cursor->x)) {
       ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
     }
     mapState.WasPointShone = true;
@@ -281,20 +281,20 @@ void checkPointToShineIt()
 
 void motionPassive(int x, int y) 
 {
-  mapState.x_passive_motion = x;
-  mapState.y_passive_motion = mapState.window_height - y;
+  mapState.passive_motion_point = malloc(sizeof(Point));
+  mapState.passive_motion_point->x = x;
+  mapState.passive_motion_point->y = mapState.window_height - y;
   glutPostRedisplay();
 }
 
 //function is used to draw a line while moving cursor from the one point to find place to click for another point
-void passiveLineMotion() 
+void passiveLineMotion(Linked_list* linked_list, Point* point1, Point* point2) 
 {
-  size_t number_of_nodes = count(mapState.points_storage);
-  Node* indexNode = mapState.points_storage->head;
-  Point* point;
+  size_t number_of_nodes = count(linked_list);
+  Node* indexNode = linked_list->head;
 
   if ((mapState.DrawingLine == START) && (number_of_nodes != 0)) {
-    drawingLine(mapState.previous_point->x, mapState.previous_point->y, mapState.x_passive_motion, mapState.y_passive_motion);
+    drawingLine(point1->x, point1->y, point2->x, point2->y);
   }
 }
 
@@ -327,7 +327,7 @@ void draw(void)
   glColor3f(0, 0, 0);
   drawBitmapText("Tools", BITMAPTEXT_X, BITMAPTEXT_Y);
   drawButtons();
-  passiveLineMotion();
+  passiveLineMotion(mapState.points_storage, mapState.previous_point, mapState.passive_motion_point);
   drawPoints();
   drawEdges();
   checkSelectedPoint();
@@ -387,11 +387,9 @@ void mouse(int button, int state, int x, int y)
     drawCircle(x, new_y, CIRCLE_DIAMETER);
   } else if (mapState.drawing_state == DRAWING_LINE && a) {
     savePointAndEdge(button, state, x, new_y);
-    findLastPoint();
     mapState.DrawingLine = START;
     draw();
     printLengthOfEdge();
-    //markShortestEdge();
   }
 }
 
@@ -428,6 +426,7 @@ int main(int argc, char *argv[])
   free(mapState.button_circle);
   free(mapState.points_storage);
   free(mapState.edges_storage);
+  free(mapState.passive_motion_point);
 
   return 0;
 }
