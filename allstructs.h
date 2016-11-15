@@ -7,7 +7,7 @@ typedef struct Point
 {
   int x;
   int y;
-  Linked_list edges_list;
+  Linked_list* edges_list;
 } Point;
 
 typedef struct Rectangle
@@ -75,7 +75,6 @@ typedef struct MapState
   Drawing_state drawing_state;
   DrawingLine DrawingLine;
   Point* previous_point; // to save the previous point for drawing edges
-  Point* last_point;
   Point* point_while_placing_cursor;
   boolean IsCursorOnPoint;
   boolean WasPointShone;
