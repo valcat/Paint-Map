@@ -70,10 +70,9 @@ typedef struct MapState
 {
   int window_width;
   int window_height;
-  int x_passive_motion;
-  int y_passive_motion;
   Drawing_state drawing_state;
   DrawingLine DrawingLine;
+  Point* passive_motion_point;
   Point* previous_point; // to save the previous point for drawing edges
   Point* point_while_placing_cursor;
   boolean IsCursorOnPoint;
