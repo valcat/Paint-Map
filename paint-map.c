@@ -12,7 +12,7 @@
 #include "rectangle.h"
 #include "line.h"
 #include "triangle.h"
-#include "graph.h"
+#include "edge.h"
 #include "find_path.h"
 
 const int WIDTH_WINDOW = 1000;
@@ -30,11 +30,10 @@ const int CIRCLE_DIAMETER = 10;
 const int BITMAPTEXT_X = 2;
 const int BITMAPTEXT_Y = 680;
 const int SIZE_OF_SHINING_CIRCLE = 8;
-const int SIZE_OF_POINT = 5;
+const int RADIUS_OF_POINT = 5;
 
 MapState mapState;
 void draw(void);
-void saveEdge(Point* point1, Point* point2);
 int returnIndexOfPoint();
 
 
@@ -174,67 +173,26 @@ void savePointAndEdge(int button, int state, int x, int y)
 
     } else if ((mapState.previous_point == NULL) && (mapState.WasPointShone == true)) {
       mapState.previous_point = mapState.point_while_placing_cursor;
-      saveEdge(mapState.previous_point, second_point);    
+      saveEdge(mapState.edges_storage, mapState.previous_point, second_point);    
     }
 
     mapState.previous_point = point;
   }
 }
 
-void saveEdge(Point* point1, Point* point2)
+void checkSelectedPoint(Linked_list* linked_list, Point* passive_motion_point)
 {
-  Edge* edge;
-  edge = createEdge(point1, point2);
-  addNode(mapState.edges_storage, edge);
-}
-
-void drawPoints(void)
-{
-  size_t number_of_nodes = count(mapState.points_storage);
+  size_t number_of_nodes = count(linked_list);
   size_t count = 0;
-  Node* indexNode = mapState.points_storage->head;
-  Point* point1;
-  Point* point2;
-
-  if (number_of_nodes > 1) {
-    while (indexNode) {   
-      point1 = indexNode->element;
-      
-      if (count < number_of_nodes - 1) {
-        point2 = indexNode->next->element;
-      }
-      drawCircle(point1->x, point1->y, SIZE_OF_POINT);
-      count++;  
-      indexNode = indexNode->next; 
-    }
-  }   
-}
-
-void drawEdges()
-{
-  Node* indexNode = mapState.edges_storage->head;
-  Edge* edge;
-
-  while (indexNode) {  
-    edge = indexNode->element; 
-    drawingLine(edge->point1->x, edge->point1->y, edge->point2->x, edge->point2->y);
-    indexNode = indexNode->next; 
-  }
-}
-
-void checkSelectedPoint()
-{
-  size_t number_of_nodes = count(mapState.points_storage);
-  size_t count = 0;
-  Node* indexNode = mapState.points_storage->head;
-  Point* point;
+  Node* indexNode = linked_list->head;
   int step = 3;
+  Point* point;
 
   if (number_of_nodes >= 1) {
     while (indexNode) {
       point = indexNode->element;
-      if ((mapState.passive_motion_point->x <= point->x + step && mapState.passive_motion_point->x >= point->x - step) 
-      && (mapState.passive_motion_point->y <= point->y + step && mapState.passive_motion_point->y >= point->y - step)) {
+      if ((passive_motion_point->x <= point->x + step && passive_motion_point->x >= point->x - step) 
+      && (passive_motion_point->y <= point->y + step && passive_motion_point->y >= point->y - step)) {
         mapState.point_while_placing_cursor = point;
         mapState.IsCursorOnPoint = true;
       }
@@ -263,14 +221,14 @@ int returnIndexOfPoint()
   }
 }
 
-void checkPointToShineIt()
+void checkPointToShineIt(Point* previous_point, Point* selected_point, int size_of_circle)
 {
   if (mapState.IsCursorOnPoint == true) {
 
-    if (mapState.previous_point == NULL) {
-      ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
-    } else if ((mapState.previous_point != NULL) && (mapState.previous_point->x != mapState.point_while_placing_cursor->x)) {
-      ShineCircleIfMouseOnPoint(mapState.point_while_placing_cursor->x, mapState.point_while_placing_cursor->y, SIZE_OF_SHINING_CIRCLE);
+    if (previous_point == NULL) {
+      ShineCircleIfMouseOnPoint(selected_point ->x, selected_point->y, size_of_circle);
+    } else if (mapState.previous_point->x != selected_point->x) {
+      ShineCircleIfMouseOnPoint(selected_point->x, selected_point->y, size_of_circle);
     }
     mapState.WasPointShone = true;
     mapState.IsCursorOnPoint = false;
@@ -328,10 +286,10 @@ void draw(void)
   drawBitmapText("Tools", BITMAPTEXT_X, BITMAPTEXT_Y);
   drawButtons();
   passiveLineMotion(mapState.points_storage, mapState.previous_point, mapState.passive_motion_point);
-  drawPoints();
-  drawEdges();
-  checkSelectedPoint();
-  checkPointToShineIt();
+  drawEdgeVertices(mapState.points_storage, RADIUS_OF_POINT);
+  drawEdges(mapState.edges_storage);
+  checkSelectedPoint(mapState.points_storage, mapState.passive_motion_point);
+  checkPointToShineIt(mapState.previous_point, mapState.point_while_placing_cursor, SIZE_OF_SHINING_CIRCLE);
   glutSwapBuffers();
   glFlush();
 }
