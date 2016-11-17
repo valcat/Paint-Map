@@ -13,7 +13,7 @@
 #include "circle.h"
 
 
-Edge* createEdge(Point* point_1st, Point* point_2nd)
+Edge* saveEdge(Point* point_1st, Point* point_2nd)
 {
 	Edge* edge = malloc(sizeof(Edge));
 	edge->point1 = point_1st;
@@ -21,12 +21,12 @@ Edge* createEdge(Point* point_1st, Point* point_2nd)
 	return edge;
 }
 
-void saveEdge(Linked_list* linked_list, Point* point1, Point* point2)
+/*void saveEdge(Linked_list* linked_list, Point* point1, Point* point2)
 {
   Edge* edge;
   edge = createEdge(point1, point2);
   addNode(linked_list, edge);
-}
+}*/
 
 void drawEdges(Linked_list* linked_list)
 {
@@ -60,4 +60,29 @@ void drawEdgeVertices(Linked_list* linked_list, int radius)
       indexNode = indexNode->next; 
     }
   }   
+}
+
+double findLengthOfEdge(int point1_x, int point1_y, int point2_x, int point2_y) 
+{
+	double length;
+	length = sqrt((pow((point1_x - point2_x), 2) + pow((point1_y - point2_y), 2)));
+	return length;
+}
+
+void printLengthOfEdge(Linked_list* linked_list)
+{
+  size_t number_of_nodes = count(linked_list);
+  size_t count = 0;
+  Node* indexNode = linked_list->head;
+  Edge* edge;
+  double length;
+
+  if (number_of_nodes >= 1) {
+    while (indexNode) {
+      edge = indexNode->element;
+      length = findLengthOfEdge(edge->point1->x, edge->point1->y, edge->point2->x, edge->point2->y);
+      count++;
+      indexNode = indexNode->next;
+    }
+  }
 }
