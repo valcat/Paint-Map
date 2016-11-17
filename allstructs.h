@@ -73,11 +73,12 @@ typedef struct MapState
   Drawing_state drawing_state;
   DrawingLine DrawingLine;
   Point* passive_motion_point;
-  Point* previous_point; // to save the previous point for drawing edges
-  Point* point_while_placing_cursor;
+  Point* previous_point; // to record the previous point for drawing edges
+  Point* selected_point;;
+  Point* current_point; // to record the current point
+  Point* marked_point;
   boolean IsCursorOnPoint;
-  boolean WasPointShone;
-  boolean WasPointSaved;
+  boolean IsPointExist;
   Panel_border* border;
   Button* button_rect;
   Button* button_triangle;
