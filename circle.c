@@ -93,7 +93,7 @@ void drawCircle(int x, int y, int radius)
   glEnd();
 }
 
-void ShineCircleIfMouseOnPoint(int x, int y, int radius)
+void shinePoint(int x, int y, int radius)
 {
   int i;
   int triangleAmount = 20;
